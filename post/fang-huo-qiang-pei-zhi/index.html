@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>防火墙配置 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+可参考：连接
+iptables语法：
+-I （插入）规则有优先级 最上面最高
+
+
+
+filter表
+1.查看filter表的规则链：
+iptables -t filter -L （默认对ip进行域名解析，-nL不解析）
+
+显示filter..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">防火墙配置</h2>
+            <div class="post-date">2022-12-19</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/fang-huo-qiang-pei-zhi.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <!-- more -->
+<p>可参考：<a href="https://www.cnblogs.com/junwured/p/16926622.html">连接</a><br>
+iptables语法：<br>
+-I （插入）规则有优先级 最上面最高<br>
+<img src="https://dydydy123.github.io/post-images/1671434364280.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1671435672988.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1671430895857.png" alt="" loading="lazy"></p>
+<h1 id="filter表">filter表</h1>
+<p>1.查看filter表的规则链：<br>
+<code>iptables -t filter -L</code> （默认对ip进行域名解析，-nL不解析）<br>
+<img src="https://dydydy123.github.io/post-images/1671430173249.png" alt="" loading="lazy"><br>
+显示filter表的INPUT规则链的规则带编号：</p>
+<p><code>iptables -t filter -L INPUT --line-number</code><br>
+<img src="https://dydydy123.github.io/post-images/1671431969122.png" alt="" loading="lazy"></p>
+<p>2.向INPUT链中添加规则，拒绝某ip进入防火墙的icmp数据。<br>
+<img src="https://dydydy123.github.io/post-images/1671431291487.png" alt="" loading="lazy"></p>
+<p>3.通过编号删除filter表INPUT链的某个规则：<br>
+<img src="https://dydydy123.github.io/post-images/1671432124398.png" alt="" loading="lazy"></p>
+<p>4.禁止从某网段的主机访问任何IP的80与443端口(该流量为出去的所以使用OUTPUT)：</p>
+<p><code>iptables -t filter -A OUTPUT -s 192.168.223.0/24 -p tcp --dport 80 -j DROP</code><br>
+使用--dport  必须使用 -p<br>
+<img src="https://dydydy123.github.io/post-images/1671433381708.png" alt="" loading="lazy"></p>
+<p>5.设置默认是模式（接受，拒绝）<br>
+<code>iptables -t filter -P INPUT DROP</code> 将INPUT规则链的默认模式改为拒绝（DROP）<br>
+<img src="https://dydydy123.github.io/post-images/1671435941254.png" alt="" loading="lazy"></p>
+<p>6.转发<br>
+先将默认模式设为拒绝<br>
+<code>iptables -t filter -P FORWARD DROP</code></p>
+<p>再允许192.168.1.0/24与192.168.2.0/24之间可互相转发<br>
+<code>iptables -t filter -A FORWARD -s 192.168.1.0/24 -d 192.168.2.0/24 -j ACCEPT</code><br>
+<code>iptables -t filter -A FORWARD -s 192.168.2.0/24 -d 192.168.1.0/24 -j ACCEPT</code></p>
+<p>7.报文检查：<br>
+iptables 常用附加模块：</p>
+<p>按包状态匹配 （state）<br>
+-m state --state 状态<br>
+<img src="https://dydydy123.github.io/post-images/1671437599887.png" alt="" loading="lazy"></p>
+<p>NEW：当建立tcp连接，三次握手发送 <code>syn</code> 时将该会话标记为new</p>
+<p>ESTABLISHED：当三次握手完成，tcp会话建立，或者udp建立标记为ESTABLISHED（稳定的）</p>
+<p>RELATED：相关联如 21与20；80与443等。</p>
+<p>tcp会话状态为 NEW,ESTABLISHED,RELATED时接受<br>
+<code>iptables -t filter -A FORWARD -d 8.8.8.8 -m state --state NEW,ESTABLISHED,RELATED -j ACCEPT</code></p>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1671438374902.png" alt="" loading="lazy"></figure>
+<h1 id="nat表">nat表</h1>
+<p>1.nat表的3个规则链<br>
+<img src="https://dydydy123.github.io/post-images/1671766756655.png" alt="" loading="lazy"></p>
+<p>2.代理与端口转发<br>
+<img src="https://dydydy123.github.io/post-images/1671767767368.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/session-fan-xu-lie-hua-yu-php-yuan-sheng-lei-ying-yong/">
+                  <h3 class="post-title">
+                    Session反序列化与php原生类应用
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

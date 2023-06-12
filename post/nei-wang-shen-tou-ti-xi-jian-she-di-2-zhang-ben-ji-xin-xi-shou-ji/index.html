@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第2章--本机信息收集 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="书中相关工具连接：
+https://yunjing.ichunqiu.com/book/2
+1.查看当前用户，权限
+查看当前用户，以及所属组，所拥有特权信息
+whoami /all
+2.查看网络配置信息
+查看当前主机网络配置情况，主机IP地..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第2章--本机信息收集</h2>
+            <div class="post-date">2023-03-30</div>
+            
+            <div class="post-content" v-pre>
+              <p>书中相关工具连接：<br>
+https://yunjing.ichunqiu.com/book/2<br>
+<strong>1.查看当前用户，权限</strong><br>
+查看当前用户，以及所属组，所拥有特权信息<br>
+<code>whoami /all</code></p>
+<p><strong>2.查看网络配置信息</strong><br>
+查看当前主机网络配置情况，主机IP地址，主机名，各个网络适配器信息等，判断当前主机所处内网网段。<br>
+值得注意的是DNS服务器的IP地址，在域中域控制器通常与DNS服务器IP地址相同。<br>
+<code>ipconfig /all</code></p>
+<p><strong>3.查看主机路由</strong><br>
+查看子网掩码为 255.255.255.0的网络目标，及是所需网段<br>
+<code>route print</code></p>
+<p><strong>4.查看操作系统信息</strong><br>
+<code>systeminfo</code><br>
+<code>systeminfo | findstr /B /C:&quot;OS Name&quot; /C:&quot;OS Version&quot;</code> 查看操作系统及其版本<br>
+<code>systeminfo | findstr /B /C:&quot;OS 名称&quot; /C:&quot;OS 版本&quot;</code> 查看操作系统及其版本</p>
+<p><strong>5.查看端口连接信息</strong><br>
+查看主机端口连接情况。<br>
+<code>netstat -ano</code></p>
+<p><strong>6.查看当前会话列表</strong><br>
+查看当前主机与所连接的客户端之间的会话。<br>
+如果我们获得了一台Windows主机的权限，在上面发现了net session，就可以利用这个net session，使用net session的token创建进程。<br>
+<code>net session</code></p>
+<p><strong>7.查看网络共享信息</strong><br>
+<code>net share</code></p>
+<p><strong>8.查看已连接的网络共享</strong><br>
+查看当前主机与其他远程主机建立的网络共享连接<br>
+<code>net use</code></p>
+<p><strong>9.查看当前进程信息</strong><br>
+查看主机所有进程的信息<br>
+<code>tasklist</code><br>
+<code>tasklist /SVC</code><br>
+在线网站：<br>
+<code>https://www.ddosi.org/av/1.php</code><br>
+<code>https://maikefee.com/</code><br>
+<code>http://payloads.net/</code></p>
+<p>wmic查看主机进程信息（路径，名称，PID）<br>
+<code>wmic process get Name,ProcessId,ExecutablePath</code><br>
+查看某进程的路径<br>
+<code>wmic process where Name=&quot;WMIC.exe&quot; get ExecutablePath</code></p>
+<p><strong>10.查看当前服务信息</strong><br>
+查看当前所有服务的信息，并过滤出服务的说明，名称，路径，创建时间，运行状态<br>
+<code>wmic service get Caption,Name,Pathname,StartName,State</code><br>
+查看某服务所有的信息，并过滤出服务的说明，名称，路径，创建时间，运行状态<br>
+<code>wmic service where Name=&quot;backdoor&quot; get Caption,Name,Pathname,StartName,State</code></p>
+<p><strong>11.查看计划任务信息</strong><br>
+<code>schtasks /query /v /fo list</code></p>
+<p><strong>12.查看自启程序信息</strong><br>
+<code>wmic startup get Caption,Command,Location,User</code></p>
+<p><strong>13.查看系统补丁安装信息</strong><br>
+查看补丁列表，并过滤补丁连接，名称，描述，补丁编号以及安装时间。可根据操作系统版本和缺少的补丁来辅助提权。<br>
+<code>wmic qfe get Caption,CSName,Description,HotFixID,InstalledOn</code></p>
+<p><strong>14.查看应用安装信息</strong><br>
+https://mp.weixin.qq.com/s/CAEtoKe6ijO39xMVZPRKkw<br>
+安装应用名称，版本<br>
+<code>wmic product  get Caption,Version</code></p>
+<pre><code>powershell.exe &quot;Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Select-Object DisplayName, DisplayVersion, Publisher, InstallDate | Format-Table -AutoSize&quot;
+</code></pre>
+<p>msf:</p>
+<pre><code>msf5 exploit(windows/misc/hta_server) &gt; use post/windows/gather/enum_applications
+msf5 post(windows/gather/enum_applications) &gt; set session 1
+msf5 post(windows/gather/enum_applications) &gt; exploit
+
+meterpreter &gt; run get_application_list
+</code></pre>
+<p><strong>15.本地用户/组信息</strong><br>
+查看本地用户信息<br>
+<code>net user</code><br>
+查看本地某用户的详细信息<br>
+<code>net user &lt;username&gt;</code></p>
+<p>查看本地管理员组的信息，其中包含全局组用户（生于林作用域）该用户在计算机加入域时自动被添加到本地管理员组<br>
+<code>net localgroup administrators</code></p>
+<p>在目标主机本地创建一个新用户，并加入本地管理员组。<br>
+<code>net user &lt;username&gt; &lt;passsword&gt; /add</code>                              创建本地用户<br>
+<code>net localgroup administrators &lt;username&gt; /add</code>            加入本地管理员组</p>
+<p><strong>16.当前登录的用户</strong><br>
+一些用户通过远程登录，登录到当前计算机会产生多个会话。<br>
+<code>query user</code></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/huan-chong-qu-yi-chu/">
+                  <h3 class="post-title">
+                    缓冲区溢出
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

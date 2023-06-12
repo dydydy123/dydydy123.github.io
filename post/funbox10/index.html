@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>funbox10 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="funbox系列靶机ova安装之后，默认桥接下靶机的网卡是没有被分配ip，需要我们手动修改密码登陆进去之后dhclient  ens33 之后ifconfig才有正确网段ip。
+1.打开靶机，按e，然后找到ro那一行删除ro及后面的部分，改..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">funbox10</h2>
+            <div class="post-date">2022-12-18</div>
+            
+            <div class="post-content" v-pre>
+              <p>funbox系列靶机ova安装之后，默认桥接下靶机的网卡是没有被分配ip，需要我们手动修改密码登陆进去之后<code>dhclient  ens33</code> 之后ifconfig才有正确网段ip。<br>
+1.打开靶机，按e，然后找到ro那一行删除ro及后面的部分，改为rw signie init=/bin/bash按ctrl+x重启服务rw是可读写 signie是单人模式init是运行级。<br>
+修改：<br>
+vi /etc/network/interfaces或者vi /etc/netplan/ 00-installer-config.yaml编辑其中的文件<br>
+https://blog.csdn.net/OVEROQ/article/details/125362366<br>
+2.进入root  shell，然后输入如下</p>
+<pre><code>// 根分区的挂载模式默认是只读，要将其改为可写
+
+mount -no remount,rw /
+
+// 修改密码,root为要修改密码的用户名
+
+passwd root(用户名)
+
+// 同步,修改根分区回到只读状态，重新启动
+
+mount -no remount,ro /
+</code></pre>
+<p>端口扫描：</p>
+<pre><code>nmap -p- -sV -A 192.168.1.1
+
+PORT    STATE SERVICE VERSION
+22/tcp  open  ssh     OpenSSH 7.2p2 Ubuntu 4ubuntu2.10 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 a2:35:c4:90:87:20:4e:b2:59:78:19:da:da:8b:c6:ed (RSA)
+|   256 55:7c:a9:99:35:1b:0e:c1:ff:5d:12:a2:1c:70:7b:84 (ECDSA)
+|_  256 20:97:69:f0:8f:e0:c9:07:ee:b0:4f:02:fb:9b:ca:0c (ED25519)
+25/tcp  open  smtp    Postfix smtpd
+|_smtp-commands: funbox10, PIPELINING, SIZE 10240000, VRFY, ETRN, STARTTLS, ENHANCEDSTATUSCODES, 8BITMIME, DSN, 
+| ssl-cert: Subject: commonName=funbox10
+| Not valid before: 2021-06-24T17:27:09
+|_Not valid after:  2031-06-22T17:27:09
+|_ssl-date: TLS randomness does not represent time
+80/tcp  open  http    Apache httpd 2.4.18 ((Ubuntu))
+|_http-server-header: Apache/2.4.18 (Ubuntu)
+|_http-title: Khronos 2.0 - Slides
+110/tcp open  pop3?
+143/tcp open  imap    Dovecot imapd
+|_imap-capabilities: CAPABILITY
+
+</code></pre>
+<p>先对80端口经行初步探测：</p>
+<pre><code>nikto -host 192.168.1.13    
+
+
+---------------------------------------------------------------------------
++ Target IP:          192.168.1.1
++ Target Hostname:    192.168.1.1
++ Target Port:        80
+---------------------------------------------------------------------------
++ Server: Apache/2.4.18 (Ubuntu)
++ The anti-clickjacking X-Frame-Options header is not present.
++ The X-XSS-Protection header is not defined. This header can hint to the user agent to protect against some forms of XSS
++ The X-Content-Type-Options header is not set. This could allow the user agent to render the content of the site in a different fashion to the MIME type
++ No CGI Directories found (use '-C all' to force check all possible dirs)
++ IP address found in the 'location' header. The IP is &quot;127.0.1.1&quot;.
++ OSVDB-630: The web server may reveal its internal or real IP in the Location header via a request to /images over HTTP/1.0. The value is &quot;127.0.1.1&quot;.
++ Server may leak inodes via ETags, header found with file /, inode: 9c86, size: 5c6348ecdbc00, mtime: gzip
++ Apache/2.4.18 appears to be outdated (current is at least Apache/2.4.37). Apache 2.2.34 is the EOL for the 2.x branch.
++ Allowed HTTP Methods: POST, OPTIONS, GET, HEAD 
++ OSVDB-3092: /readme.txt: This might be interesting...
++ OSVDB-3233: /icons/README: Apache default file found.
+</code></pre>
+<p>对网站经行目录扫描：</p>
+<pre><code>/.html.bak            (Status: 403) [Size: 277]
+/.html                (Status: 403) [Size: 277]
+/images               (Status: 301) [Size: 313] [--&gt; http://192.168.1.13/images/]
+/index.html           (Status: 200) [Size: 40070]
+/.php                 (Status: 403) [Size: 277]
+/catalog              (Status: 301) [Size: 314] [--&gt; http://192.168.1.13/catalog/]
+/css                  (Status: 301) [Size: 310] [--&gt; http://192.168.1.13/css/]
+/js                   (Status: 301) [Size: 309] [--&gt; http://192.168.1.13/js/]
+
+</code></pre>
+<p>访问<code>/catalog </code> 时发现是一个框架，本地搜索下漏洞<br>
+<img src="https://dydydy123.github.io/post-images/1671423534357.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1671423720809.png" alt="" loading="lazy"></p>
+<p>然后查看定时任务时发现一可以任务查看发现root 密码</p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

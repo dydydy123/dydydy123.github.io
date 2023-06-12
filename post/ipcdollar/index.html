@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>ipc$ | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="ipc$
+IPC$(Internet Process Connection)是共享”命名管道”的资源，它是为了让进程间通信而开放的命名管道，可以通过验证用户名和密码获得相应的权限,在远程管理计算机和查看计算机的共享资源时使用。
+利用条件：
+..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">ipc$</h2>
+            <div class="post-date">2023-03-27</div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>ipc$</strong></p>
+<p><code>IPC$(Internet Process Connection)是共享”命名管道”的资源，它是为了让进程间通信而开放的命名管道，可以通过验证用户名和密码获得相应的权限,在远程管理计算机和查看计算机的共享资源时使用。</code><br>
+<strong>利用条件：</strong><br>
+139或445端口开启：</p>
+<p>如果目标主机没有开放139或445端口，我们去使用IPC$连接的话，会提示找不到网络名。</p>
+<p>SMB协议（445端口）：这个不用多说了吧，windows文件打印共享服务用的就是这个服务，之前的永恒之蓝就是利用的这个端口，而且平时我想用pad看一些电影的时候，都是先会通过电脑下载下来，然后开个文件共享，然后pad去访问电脑的445端口就可以了</p>
+<p>NETBios（139端口）：NetBIOS协议是一种在局域网上的程序可以使用的应用程序编程接口（API）</p>
+<p>在WindowsNT中SMB基于NBT实现，即使用139（TCP）端口；而在Windows2000中，SMB除了基于NBT实现，还可以直接通过445端口实现</p>
+<p><strong>NetBIOS</strong><br>
+NetBIOS，为网络基本输入输出系统（英语：Network Basic Input/Output System）的缩写，它提供了OSI模型中的会话层服务，让在不同电脑上运行的不同程序，可以在局域网中，互相连线，以及分享资料。严格来说，NetBIOS不是一种网络协议，而是应用程序接口（API）。较古老的操作系统，使用IEEE 802.2与IPX/SPX协议，可以使用NetBIOS Frames协议或NetBIOS over IPX/SPX协议来运作。现代操作系统，多数都使用TCP/IP协议，则可透过NetBIOS over TCP/IP协议来相互通信，广播包。</p>
+<p>NetBIOS提供三种软件服务：<br>
+Service Name	Port	Protocol	Short Name<br>
+NetBIOS Name Service	137	UDP/TCP	NBNS<br>
+NetBIOS Datagram	138	UDP	NBND<br>
+NetBIOS Session Service	139	TCP	NBSS</p>
+<p><strong>smb密码爆破：</strong><br>
+https://xz.aliyun.com/t/11783<br>
+思路</p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

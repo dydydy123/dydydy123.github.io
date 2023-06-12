@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>设备课后问题 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="第一次：
+1.组成网络的主要部件有：
+终端设备，中间设备，网络介质
+2.常见网络拓扑图有几种？各自特点？何为融合网络？
+1）物理拓扑图：
+物理拓扑图说明了中间设备和电缆安装的物理位置
+2）逻辑拓扑图：
+逻辑拓扑图说明了设备、端口和网络的编址..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">设备课后问题</h2>
+            <div class="post-date">2023-06-02</div>
+            
+            <div class="post-content" v-pre>
+              <p>第一次：<br>
+<strong>1.组成网络的主要部件有：</strong><br>
+终端设备，中间设备，网络介质</p>
+<p><strong>2.常见网络拓扑图有几种？各自特点？何为融合网络？</strong><br>
+1）物理拓扑图：<br>
+物理拓扑图说明了中间设备和电缆安装的物理位置<br>
+2）逻辑拓扑图：<br>
+逻辑拓扑图说明了设备、端口和网络的编址方案<br>
+3）融合网络：<br>
+融合网络能够通过相同的网络基础设施，在许多不同类型的设备之间传输数据、语音和视频。此网络基础设施采用一组相同的规则、协议和实施标准。融合数据网络在一个网络中传送多种服务。</p>
+<p><strong>3.访问思科交换机的方法有那些？思科操作系统的命令模式有那些，要配置设备必须进入什么模式</strong><br>
+控制台，ssh，telnet</p>
+<p>用户 EXEC 模式 - 该模式功能有限，但可用于有效执行基本操作。它只允许有限数量的基本监控命令，不允许执行任何可能改变设备配置的命令。用户 EXEC 模式由采用 &gt; 符号结尾的 CLI 提示符标识。<br>
+特权 EXEC 模式 - 要执行配置命令，网络管理员必须访问特权 EXEC 模式。较高级别的配置模式，比如全局配置模式，只能通过特权 EXEC 模式访问。特权 EXEC 模式由采用# 符号结尾的提示符标识。</p>
+<p>要配置设备，用户必须进入全局配置模式。</p>
+<p><strong>4.配置特权模式密码的命令，加密密码的命令</strong><br>
+enable secret password</p>
+<p>service password-encryption</p>
+<p><strong>5.保存配置信息的命令是什么？为什么要用默认网关？</strong><br>
+copy running-config startup-config<br>
+因为交换机是二层设备，没路由功能所需要指定路由功能路由器或者三层交换机址作默认网关</p>
+<p><strong>6.解释下面命令：</strong></p>
+<pre><code>configure terminal                                      进入全局配置模式
+interface vlan 1                                           进入 VLAN 1 的接口配置模式。
+ip address   192.168.1.20 255.255.255.0     将 IPv4 地址配置为 192.168.1.20，将子网掩码配置为 255.255.255.0。         
+no shutdown                                                启动接口
+exit                                                               从全局配置模式的任何子配置模式切换到模式层级中的上一级模式，请输入exit命令。
+ip default-gateway 192.168.1.1                   设置默认网关
+</code></pre>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

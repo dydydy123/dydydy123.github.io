@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>设备实验 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+十、路由基本配置
+10.1配置初始路由器设置
+基本路由器配置步骤
+1、配置设备名称
+Switch(config)#hostname hostname
+
+2、保护特权模式
+Switch(config)#enable secret passw..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">设备实验</h2>
+            <div class="post-date">2023-05-27</div>
+            
+            <div class="post-content" v-pre>
+              <!-- more -->
+<p>十、路由基本配置</p>
+<h1 id="101配置初始路由器设置">10.1配置初始路由器设置</h1>
+<p>基本路由器配置步骤</p>
+<p>1、配置设备名称</p>
+<pre><code>Switch(config)#hostname hostname
+</code></pre>
+<p>2、保护特权模式</p>
+<pre><code>Switch(config)#enable secret password
+</code></pre>
+<p>3、保护用户模式</p>
+<pre><code>Switch(config)#line console 0
+Switch(config-line)#password password
+Switch(config-line)#login
+</code></pre>
+<p>4、保护远程Telnet/SSH访问</p>
+<pre><code>Switch(config-line)#line vty 0 4       交换机（0  15）
+Switch(config-line)#password password
+Switch(config-line)#login
+Switch(config-line)#transport input {ssh | telnet}
+</code></pre>
+<p>5、保护配置文件中的所有密码。</p>
+<pre><code>Switch(config-line)#exit
+Switch(config)#service password-encryption
+</code></pre>
+<p>6、提供法律通知</p>
+<pre><code>Switch(config)#banner motd #delimiter message delimiter#
+</code></pre>
+<p>7、保存配置</p>
+<pre><code>Switch(config)#end
+Switch#copy running-config startup-config
+</code></pre>
+<h1 id="102配置接口">10.2配置接口</h1>
+<p>1、进入全局模式</p>
+<pre><code>R1#configure terminal
+</code></pre>
+<p>2、配置接口GigabitEthernet 0/0/0</p>
+<pre><code>R1(config)#interface gigabitethernet 0/0/0
+
+交换机：
+interface vlan 1
+ip address ...
+</code></pre>
+<p>3、将链路描述为“Link to LAN”</p>
+<pre><code>R1(config-if)#description to Link to LAN
+</code></pre>
+<p>4、使用 IPv4 地址192.168.10.1和子网掩码255.255.255.0配置接口</p>
+<pre><code>R1(config-if)#ip address 192.168.10.1 255.255.255.0
+</code></pre>
+<p>5、使用 IPv6 地址 2001:db8:acad:10::1 和前缀长度**/64**配置接口</p>
+<pre><code>R1(config-if)#ipv6 address 2001:db8:acad:10::1/64
+</code></pre>
+<p>6、启用接口并返回全局配置模式。</p>
+<pre><code>R1(config-if)#no shutdown
+R1(config-if)#exit
+</code></pre>
+<h1 id="103配置默认网关">10.3配置默认网关</h1>
+<p>1、进入全局</p>
+<pre><code>S1#configure terminal
+</code></pre>
+<p>2、将 S1 的默认网关配置为“192.168.10.1”</p>
+<pre><code>S1(config)#ip default-gateway 192.168.10.1
+</code></pre>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

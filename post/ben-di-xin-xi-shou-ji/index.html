@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>本地信息收集 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.IE浏览器代理信息查看：
+reg query &quot;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings&quot;
+
+
+2.w..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">本地信息收集</h2>
+            <div class="post-date">2023-01-11</div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>1.IE浏览器代理信息查看：</strong></p>
+<pre><code>reg query &quot;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Internet Settings&quot;
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1673438853194.png" alt="" loading="lazy"></figure>
+<p><strong>2.windows wifi 密码获取：</strong></p>
+<pre><code>查看连过的wifi name：
+netsh wlan show profile
+</code></pre>
+<pre><code>查看连过的wifi name的密码：
+netsh wlan show profile name=&quot;10&quot; key=clear
+</code></pre>
+<p><strong>3.win hosts文件</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673439496578.png" alt="" loading="lazy"></p>
+<p><strong>4.iis 站点列表，路径与密码：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673439706349.png" alt="" loading="lazy"></p>
+<p><strong>5.回收站信息：</strong><br>
+获取不同用户的sid对应的回收站内容：<br>
+<img src="https://dydydy123.github.io/post-images/1673439988296.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1673440442398.png" alt="" loading="lazy"></p>
+<p><strong>6.谷歌浏览器信息：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673442726166.png" alt="" loading="lazy"></p>
+<p><strong>7.win日志：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673442752170.png" alt="" loading="lazy"></p>
+<p><strong>8.pshell：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673442916612.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

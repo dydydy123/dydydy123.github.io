@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第2章--域内基础信息收集 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.判断是否存在域环境
+查看当前工作站信息，包括当前计算机名，用户名，系统版本，工作站，登录的域等。
+net config workstation
+2.查看域用户信息
+查看所有域用户
+net user /domain
+查看指定域用户
+net..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第2章--域内基础信息收集</h2>
+            <div class="post-date">2023-03-31</div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>1.判断是否存在域环境</strong><br>
+查看当前工作站信息，包括当前计算机名，用户名，系统版本，工作站，登录的域等。<br>
+<code>net config workstation</code></p>
+<p><strong>2.查看域用户信息</strong><br>
+查看所有域用户<br>
+<code>net user /domain</code><br>
+查看指定域用户<br>
+<code>net user &lt;username&gt; /domain</code></p>
+<p>查看所有用户的SID，所属域和用户描述信息<br>
+<code>wmic useraccount get Caption,Domain,Description</code></p>
+<p><strong>3.查看域用户组信息</strong><br>
+常见域内系统全局组：<br>
+Domain Admins：        域管理员组 （只对本域有完全控制权限）<br>
+Domain Users：           域用户组<br>
+Domain Computers     域成员主机组<br>
+Domain Controllers     域控制器组<br>
+Domain Guests            域访客用户组<br>
+Group Policy Creator Owners           新建组策略对象组</p>
+<p>通用组：（对域林中所有域有完全控制权限）<br>
+Enterprise Admins         企业系统管理员组</p>
+<p>默认情况下Domain Admins，Enterprise Admins 组中的用户对域内所有域控制器和域成员主机拥有完全控制权限。</p>
+<p>查看域内所有用户组信息<br>
+<code>net group /domain</code><br>
+查看所有域管理员组用户<br>
+<code>net group &quot;Domain Admins&quot; /domain</code><br>
+查看所有域成员主机组用户，获得所有客户端主机<br>
+<code>net group &quot;Domain Computers&quot; /domain</code></p>
+<p><strong>4.域内密码管理策略</strong><br>
+<code>net accounts /domain</code></p>
+<p><strong>5.查看域控制器列表</strong><br>
+获取所有域控组用户，可以得到所有的域控制器的主机名。<br>
+<code>net group &quot;Domain Controllers&quot; /domain</code><br>
+查看指定域的域控制器列表。<br>
+<code>nltest /DCLIST:god.org</code></p>
+<p><strong>6.查看主域控</strong><br>
+<code>net time /domain</code></p>
+<p><strong>7 定位域控制器</strong><br>
+<code>ping OWA.god.org</code><br>
+查看DNS服务器定位：<br>
+<code>ipconfig /all</code></p>
+<p><strong>8 查看域信任关系</strong><br>
+<code>nltest /domain_trusts</code></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-ben-ji-xin-xi-shou-ji/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第2章--本机信息收集
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

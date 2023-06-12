@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第7章--kerberos攻击专题（kerberos认证基础） | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.kerberos认证基础
+简写名词：
+KDC（Key Distribution Center）= 密钥分发中心
+AS（Authentication Server）= 认证服务器
+TGS（Ticket Granting Server）= ..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第7章--kerberos攻击专题（kerberos认证基础）</h2>
+            <div class="post-date">2023-04-15</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/nei-wang-shen-tou-ti-xi-jian-she-di-7-zhang-kerberos-gong-ji-zhuan-ti.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="1kerberos认证基础">1.kerberos认证基础</h1>
+<p><strong>简写名词：</strong></p>
+<p>KDC（Key Distribution Center）= 密钥分发中心<br>
+AS（Authentication Server）= 认证服务器<br>
+TGS（Ticket Granting Server）= 票据授权服务器<br>
+TGT（Ticket Granting Ticket）= 票据授权票据，票据的票据</p>
+<p>流程图<br>
+<img src="https://dydydy123.github.io/post-images/1681562347574.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681616291384.png" alt="" loading="lazy"></p>
+<p><strong>1.AS-REQ：</strong><br>
+1.Client向AS以明文形式发起请求，请求携带，用户名，服务名，ip，时间戳等。<br>
+<img src="https://dydydy123.github.io/post-images/1681710196004.png" alt="" loading="lazy"></p>
+<p><strong>2.AS-REP：</strong><br>
+1.AS接收请求，后去Kerberos认证数据库中根据用户名查找是否存在该用户，此时只会查找是否有相同用户名的用户，并不会判断身份的可靠性。<br>
+2.如果没有该用户名，认证失败，服务结束；如果存在该用户名，则AS认证中心便认为用户存在，此时便会返回给客户端，其中包含两部分内容：</p>
+<pre><code>(1) 第一部分内容是使用客户端密码hash加密的一段内容，其中包括用于客户端和TGS间通信的`TGS Session Key`,客户端即将访问的TGS的Name以及TGT的有效时间，和一个当前时间戳。该部分内容使用客户端密钥加密，所以客户端在拿到该部分内容时可以通过自己的密钥解密。如果是一个假的客户端，那么他是不会拥有真正客户端的密钥的，因为该密钥也从没在网络中进行传输过。这也同时认证了客户端的身份，如果是假客户端会由于解密失败从而中断认证流程。
+(2) 第二部分内容称为TGT，它叫做票据授予票据(由`krbtgt的NTML-hash`加密)，客户端需要使用TGT去KDC中的TGS(票据授予中心)获取访问网络服务所需的Ticket(服务授予票据 TS)，TGT中包含的内容有PAC（用于验证用户权限，只有KDC能制作和查看）Kerberos数据库中存在的该客户端的Name、IP、当前时间戳、客户端即将访问的TGS的Name、TGT的有效时间以及一把用于客户端和TGS间进行通信的`TGS Session Key`。整个TGT使用TGS密钥加密，客户端是解密不了的，由于密钥从没有在网络中传输过，所以也不存在密钥被劫持破解的情况。
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1681710255356.png" alt="" loading="lazy"></figure>
+<p><strong>3.TGS_REQ：</strong><br>
+1.此时的客户端收到了来自KDC中AS的响应，并获取到了其中的两部分内容。客户端会用自己的密码hash将第一部分内容进行解密，分别获得时间戳，自己将要访问的TGS的信息，和用于与TGS通信时的密钥<code>TGS Session Key</code>。<br>
+2.首先客户端会根据时间戳判断该时间戳与自己发送请求时的时间的差值是否大于5分钟，如果大于5分钟则认为该AS是伪造的，认证至此失败。如果时间戳合理，客户端便准备向TGS发起请求，其次请求的目的是为了获取能够访问目标网络服务的服务授予票据(TS)。<br>
+3.客户端将携带三部分内容交给KDC中的TGS：</p>
+<pre><code>(1).客户端将使用TGS密钥（krbtgt的NTML-hash）加密的TGT也原封不动的也携带给TGS；
+(2).客户端将自己想要访问的Server服务以明文的方式发送给TGS；
+(3).客户端使用TGS Session Key加密将自己的客户端信息发送给TGS，其中包括客户端名、IP、时间戳；
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1681710318767.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681710621093.png" alt="" loading="lazy"></p>
+<p><strong>4.TGS_REP：</strong><br>
+1.此时KDC中的TGS(票据授予服务器)收到了来自客户端的请求。它首先根据客户端明文传输过来的Server服务信息，查看当前Kerberos系统中是否存在可以被用户访问的该服务。如果不存在，认证失败结束。如果存在，则继续接下来的认证。</p>
+<p>2.TGS使用<code>krbtgt用户的NTML-hash</code>将TGT中的内容进行解密，此时它看到了经过AS认证过后并记录的用户信息，一把<code>TGS Session Key</code>，还有时间戳信息，他会根据时间戳判断此次通信是否真是可靠有无超出时延。</p>
+<p>3.如果时延正常，则TGS会使用<code>TGS Session Key</code>对客户端的第三部分内容进行解密(使用<code>TGS Session Key</code>加密的客户端信息)，取出其中的用户信息和TGT中的用户信息进行比对，如果全部相同则认为客户端身份正确，方可继续进行下一步。</p>
+<p>4.此时TGS将返回响应给客户端，响应内容包括：</p>
+<pre><code>(1) 第一部分：使用TGS Session Key加密的内容，其中包括Service Session Key和时间戳，还有TGT的有效时间。由于在第一次通信的过程中，AS已将TGS Session Key通过客户端密码加密交给了客户端，且客户端解密并缓存了TGS Session Key，所以该部分内容在客户端接收到时是可以自己解密的。
+(2) 第二部分：用于客户端访问网络服务使用`Server的NTML-hash`加密的ST(Server Ticket)，其中包括客户端的Name，IP，需要访问的网络服务的地址Server IP，ST的有效时间，时间戳以及用于客户端和服务端之间通信的 Service Session Key。
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1681710668240.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681710797661.png" alt="" loading="lazy"></p>
+<p><strong>5.AP_REQ：</strong><br>
+1.此时的客户端收到了来自KDC中TGS的响应，并使用缓存在本地的TGS Session Key解密了第一部分内容(第二部分内容中的ST是由Server的NTML-hash加密的，客户端无法解密)，检查时间戳无误后取出其中的Service Session Key准备向服务端发起最后的请求。<br>
+2.客户端使用Service Session Key将自己的主机信息和时间戳进行加密作为交给服务端的第二部分内容，然后将ST(服务授予票据)作为第一部分内容都发送给服务端。<br>
+<img src="https://dydydy123.github.io/post-images/1681710932374.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681710999004.png" alt="" loading="lazy"></p>
+<p><strong>6.AP_REP：</strong><br>
+1.服务器此时收到了来自客户端的请求，它会使用自己的Server NTML-hash，将客户端第一部分内容进行解密，核对时间戳之后将其中的Service Session Key取出，使用Service Session Key将客户端发来的第二部分内容进行解密，从而获得经过TGS认证过后的客户端信息，此时它将这部分信息和客户端第一部分解密内容带来的自己的信息进行比对，最终确认该客户端就是经过KDC认证的具有真实身份的客户端，是它可以提供服务的客户端。此时服务端返回一段使用Service Session Key加密的表示接收请求的响应给客户端，在客户端收到请求之后，使用缓存在本地的Service Session Key解密之后也确定了服务端的身份(其实服务端在通信的过程中还会使用数字证书证明自己身份)。<br>
+<img src="https://dydydy123.github.io/post-images/1681711040443.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681711153250.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681711175749.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681711188578.png" alt="" loading="lazy"><br>
+客户端确定了服务端的身份后将ST缓存下来<br>
+<img src="https://dydydy123.github.io/post-images/1681711214920.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-5-zhang-heng-xiang-yi-dong-shang-ha-xi-chuan-di/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第5章--横向移动下(哈希传递等)
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

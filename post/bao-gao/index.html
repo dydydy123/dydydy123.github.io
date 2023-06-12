@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>报告 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+1.登录页面测试
+1.1万能密码
+' or sleep(1)--
+' or sleep(1)#
+1.2弱口令/空口令
+1.3Sql注入
+有的系统在登录口就存在SQL注入，我们通过正常登录进行抓包，然后发送到repeater进行不断尝试。
+..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">报告</h2>
+            <div class="post-date">2023-04-19</div>
+            
+            <div class="post-content" v-pre>
+              <!-- more -->
+<h1 id="1登录页面测试">1.登录页面测试</h1>
+<p><strong>1.1万能密码</strong><br>
+' or sleep(1)--<br>
+' or sleep(1)#</p>
+<p><strong>1.2弱口令/空口令</strong></p>
+<p><strong>1.3Sql注入</strong><br>
+有的系统在登录口就存在SQL注入，我们通过正常登录进行抓包，然后发送到repeater进行不断尝试。<br>
+或者直接Sqlmap梭哈，用Burp抓个登录包，放入txt，然后用sqlmap跑。</p>
+<p><strong>1.4密码找回功能</strong><br>
+应答中存在影响后续逻辑的状态参数：<br>
+返回包正确的回显为<code>{&quot;code&quot;:0}</code><br>
+将返回包的东西换成<code>{&quot;code&quot;:0}</code>，即可绕过验证码以及重置密码。</p>
+<p>img:&quot;https://modernpark.cm-agri.com/wKidUWQ_tFuAN9rGAABc6Uotl80864.jpg&quot;<br>
+{&quot;userId&quot;:&quot;1&quot;,&quot;userName&quot;:&quot;admin&quot;,&quot;realName&quot;:&quot;1&quot;,&quot;roleList&quot;:[{&quot;roleId&quot;:&quot;1&quot;,&quot;roleName&quot;:&quot;超级管理员&quot;}],&quot;tokenId&quot;:&quot;m+elzkjHpsW+T6LgXF1jog==&quot;,&quot;orgId&quot;:&quot;1f4f740085ed40f3959488ca70f3a54f&quot;,&quot;orgName&quot;:&quot;测试中心&quot;,&quot;img&quot;:&quot;https://modernpark.cm-agri.com/group1/M00/00/05/wKidUWQ_tFuAN9rGAABc6Uotl80864.jpg&quot;}</p>
+<p>Cmii@2022cm<br>
+{&quot;verify&quot;:&quot;UWKB0R9Un0ee9fn/OyRXxg==&quot;,&quot;code&quot;:&quot;nRBMNmSbg64zOAdlgk2bsQ==&quot;,&quot;mobile&quot;:&quot;Y66qfYVJuL1F5joLht7vGg==&quot;,&quot;password&quot;:&quot;1AYWDSoMVxgMyDFPu+lfpGooZd70Pk3kW0YawQH1K04qmdwPVX9a4fHyJLuwjXrj&quot;}</p>
+<p>{&quot;verify&quot;:&quot;UWKB0R9Un0ee9fn/OyRXxg==&quot;,&quot;code&quot;:&quot;bGEqjxW68lTvxr2To+QLyQ==&quot;,&quot;mobile&quot;:&quot;Y66qfYVJuL1F5joLht7vGg==&quot;,&quot;password&quot;:&quot;1AYWDSoMVxgMyDFPu+lfpGooZd70Pk3kW0YawQH1K04qmdwPVX9a4fHyJLuwjXrj&quot;}</p>
+<p>17313038462<br>
+tangwen  登录成功包</p>
+<p>{&quot;code&quot;:&quot;0&quot;,&quot;message&quot;:&quot;ok&quot;,&quot;data&quot;:{&quot;userId&quot;:&quot;fbb874d33bfa4d19be35c584ee5174ee&quot;,&quot;userName&quot;:&quot;tangwen&quot;,&quot;realName&quot;:&quot;唐文&quot;,&quot;roleList&quot;:[{&quot;roleId&quot;:&quot;baf156c6e88c47e59f873ed625725a01&quot;,&quot;roleName&quot;:&quot;超级管理员&quot;}],&quot;tokenId&quot;:&quot;D5DcaHq4i0LNS0e/dRuxbA==&quot;,&quot;orgId&quot;:&quot;1f4f740085ed40f3959488ca70f3a54f&quot;,&quot;orgName&quot;:&quot;测试中心&quot;,&quot;img&quot;:null}}</p>
+<p>{&quot;code&quot;:&quot;0&quot;,&quot;message&quot;:&quot;ok&quot;,&quot;data&quot;:{&quot;userId&quot;:&quot;7f0e54d6aff649f0883f6b8c91a329e0&quot;,&quot;userName&quot;:&quot;stester&quot;,&quot;realName&quot;:&quot;测试01&quot;,&quot;roleList&quot;:[{&quot;roleId&quot;:&quot;baf156c6e88c47e59f873ed625725a01&quot;,&quot;roleName&quot;:&quot;超级管理员&quot;}],&quot;tokenId&quot;:&quot;6KMFjGKH9N0WLD8KQEUKRw==&quot;,&quot;orgId&quot;:&quot;1f4f740085ed40f3959488ca70f3a54f&quot;,&quot;orgName&quot;:&quot;测试中心&quot;,&quot;img&quot;:&quot;https://modernpark.cm-agri.com/group1/M00/00/05/wKidUWQ_tFuAN9rGAABc6Uotl80864.jpg&quot;}}</p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

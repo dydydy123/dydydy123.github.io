@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>凭证收集 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.工具：
+
+2.hash类型：
+
+windows下hash格式：
+
+3.猕猴桃非交互式使用：
+
+:: 为帮助命令
+log ???.txt  ：将结果存入???.txt
+privilege::debug ：提升权限（猕猴桃需要权限执行）
+t..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">凭证收集</h2>
+            <div class="post-date">2023-01-10</div>
+            
+            <div class="post-content" v-pre>
+              <p><strong>1.工具：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673333101116.png" alt="" loading="lazy"></p>
+<p><strong>2.hash类型：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673333121741.png" alt="" loading="lazy"><br>
+windows下hash格式：<br>
+<img src="https://dydydy123.github.io/post-images/1673333141489.png" alt="" loading="lazy"></p>
+<p><strong>3.猕猴桃非交互式使用：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673333258905.png" alt="" loading="lazy"><br>
+:: 为帮助命令<br>
+log ???.txt  ：将结果存入???.txt<br>
+privilege::debug ：提升权限（猕猴桃需要权限执行）<br>
+token::elevate ：获取管理员token<br>
+token::whoami ：当前token为那个用户<br>
+lsadump::sam ：返回sam文件中用户的hash等信息<br>
+sekurlsa::logonpasswds ：返回明文信息</p>
+<p><strong>4.  1.x版本：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673334366732.png" alt="" loading="lazy"><br>
+lsass.exe  中存在密码hash，通过注入dll获取信息</p>
+<p><strong>5. powershell远程获取猕猴桃</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673334572894.png" alt="" loading="lazy"><br>
+猕猴桃免杀混淆拼凑绕过：<br>
+<img src="https://dydydy123.github.io/post-images/1673334757007.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1673339494621.png" alt="" loading="lazy"></p>
+<p><strong>6.get-hashs：</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673338749537.png" alt="" loading="lazy"></p>
+<p><strong>7.注册表获取hash</strong><br>
+<img src="https://dydydy123.github.io/post-images/1673339571623.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

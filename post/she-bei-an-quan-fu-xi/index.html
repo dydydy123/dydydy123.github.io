@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>设备安全--复习 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="问题一：
+1.将192.168.11.10转二进制？
+11000000.10101000.00001011.00001010
+2.已知192.168.11.10/24，求网络地址？
+网络地址（IP与子网掩码做&amp;与运算）：
+11000..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">设备安全--复习</h2>
+            <div class="post-date">2023-04-06</div>
+            
+            <div class="post-content" v-pre>
+              <h1 id="问题一">问题一：</h1>
+<p><strong>1.将192.168.11.10转二进制？</strong><br>
+11000000.10101000.00001011.00001010</p>
+<p><strong>2.已知192.168.11.10/24，求网络地址？</strong><br>
+网络地址（IP与子网掩码做&amp;与运算）：<br>
+11000000.10101000.00001011.00001010<br>
+&amp;<br>
+11111111.11111111.11111111.00000000</p>
+<p>11000000.10101000.00001011.00000000</p>
+<p><strong>3.172.31.21.10，127.27.20.10，169.254.72.6三个地址那个是私有地址，那个是回环地址，本地链路？</strong></p>
+<p>10.0.0.0/8	10.0.0.0 - 10.255.255.255<br>
+172.16.0.0/12	172.16.0.0 - 172.31.255.255<br>
+192.168.0.0/16	192.168.0.0 - 192.168.255.255<br>
+私有：        172.31.21.10（10.0.0.0/8到10.255.255.255，172.16.0.0/12到172.31.255.255，192.168.0.0/16到192.168.255.255）</p>
+<p>回环：        127.27.20.10 (127.0.0.0/24到127.255.255.254)<br>
+本地链路： 169.254.72.6 （196.254.0.0/8到196.254.255.254）</p>
+<p><strong>4.IPV6有多少位IPV6最重要的两个单播地址</strong></p>
+<p>IPV6：128位<br>
+IPv6地址通常有两个单播地址：全局单播地址（GUA）链路本地地址（LLA）</p>
+<p><strong>5.IPV6地址：</strong><br>
+2001:0DB8:0000:1111:0000:0000:0000:0200<br>
+采用规则压缩：<br>
+规则 1 - 省略前导 0：</p>
+<pre><code>第一条有助于缩短 IPv6 地址记法的规则是省略十六进制数中的所有前导 0（零）。以下是省略前导零的四个方法示例：
+
+01ab 可表示为 1ab
+09f0 可表示为 9f0
+0a00 可表示为 a00
+00ab 可表示为 ab
+此规则仅适用于前导 0，不适用于后缀 0，否则会造成地址不明确。例如，十六进制的“abc”可能是“0abc”，也可能是“abc0”，但这些表示的值不相同。
+</code></pre>
+<p>规则1处理：2001:DB8:0:1111:0:0:0:200<br>
+规则 2 - 双冒号：</p>
+<pre><code>第二条有助于缩短 IPv6 地址记法的规则是使用双冒号 (::) 替换任何由一个或多个全由 0 组成的16 位十六进制数组成的连续字符串。例如，2001:db8:cafe:1:0:0:0:1（前导0省略）可以表示为2001:db8:cafe:1::1。双冒号 (::) 用于代替三个全 0十六进制数 (0:0:0)。
+
+双冒号 (::) 仅可在每个地址中使用一次，否则可能会得出一个以上的地址。当与忽略前导 0 的方法一起使用时，IPv6 地址记法可以大幅缩短。这通常称为压缩格式。
+
+下面是一个不正确使用双冒号的例子：2001:db8::abcd::1234。
+
+在上面的例子中，双冒号使用了两次。以下是这个不正确的压缩格式地址可能的扩展:
+
+2001:db8::abcd:0000:0000:1234
+2001:db8::abcd:0000:0000:0000:1234
+2001:db8:0000:abcd::1234
+2001:db8:0000:0000:abcd::1234
+如果一个地址有多个连续的全为0的十六进制数字符串，最佳实践是在最长的字符串上使用双冒号(::)。如果字符串相等，则第一个字符串应使用双冒号 (::)。
+</code></pre>
+<p>规则1处理后规则2处理：2001:DB8:0:1111::200</p>
+<h1 id="问题二">问题二：</h1>
+<p><strong>1.交换机的学习转发方式的两个步骤？交换机的转发方式？</strong><br>
+<code>交换机的学习转发方式的两个步骤：</code><br>
+1.检查源MAC地址：<br>
+如果源MAC在表中，重置刷新计算器（默认情况下保留5分钟），如果对应入向端口改变，交换机将视为新的条目，使用相同的 MAC 地址和最新的端口号来替换原条目。<br>
+如果源 MAC 地址没有保存在 MAC 地址表中，那么这个地址和入向端口号都会添加到 MAC 地址表中。</p>
+<p>2.检查目的MAC地址：<br>
+如果目的 MAC 地址在表中，交换机会把帧从指定端口发送出去。<br>
+如果表中不存在该地址，交换机会从除传入端口外的所有端口转发帧。这称为未知单播。如果目的 MAC 地址为广播或组播，该帧也将被泛洪到除传入端口外的所有端口。</p>
+<p><code>交换机的转发方式：</code><br>
+存储转发交换 - 这种方式会在交换机收到整个帧，并使用称为“循环冗余校验 (CRC)”的数学错误检查机制检查了这个帧是否存在错误后，再对帧作出转发决策。存储转发交换是思科主要的 LAN 交换方式。</p>
+<p>直通式交换 - 这种方式会在确定了入站帧的目的 MAC 地址和出向端口之后，就开始转发。</p>
+<p><strong>2.分析集线器，交换机，路由器各是否包含冲突域或广播域？</strong><br>
+冲突域：<br>
+在传统的基于集线器的以太网段中，网络设备会争用共享的介质。在设备之间共享相同带宽的网段称为冲突域。当位于同一个冲突域内的两台或多台设备同时尝试通信时，就会发生冲突。如果以太网交换机端口工作在半双工模式下，那么每个网段都处于自己的冲突域当中。当交换机端口工作在全双工模式下时，就不存在冲突域。但是，如果交换机端口工作在半双工模式下时，就可能存在冲突域。</p>
+<p>广播域：<br>
+相连交换机的集合构成了一个广播域。只有网络层设备（例如路由器）可以分隔第 2 层广播域。路由器用于分隔广播域，但也将分隔冲突域。</p>
+<p>冲突域：集线器，交换机<br>
+广播域：交换机，路由器</p>
+<p><strong>3.什么是本征VLAN？什么是管理VLAN？普通VLAN范围？扩展VLAN范围？</strong></p>
+<p>本征 VLAN：</p>
+<pre><code>本征VLAN的目的是充当中继链路两端的公共标识
+
+当一个 VLAN 中的用户流量被发送到另一台交换机时，必须使用 VLAN ID 对流量进行标记。在交换机之间使用中继端口，就是为了支持有标记的流量的传输。具体而言，802.1Q 中继端口会在以太网帧报头中插入一个 4 字节的标记，来标识这个帧所属的 VLAN。
+
+交换机可能还需要通过中继链路来发送未标记的流量。未标记的流量由交换机生成，也可能来自一些古老的设备。802.1Q 中继端口会将未标记的流量放入本征 VLAN 中。思科交换机上的本征 VLAN 是 VLAN 1（即默认 VLAN）。
+
+最佳做法是将本征 VLAN 配置为未使用的 VLAN，让本征 VLAN 不同于 VLAN 1 和其他 VLAN。事实上，用一个固定 VLAN 作为交换域中所有中继端口的本征 VLAN ，这种做法并不罕见。
+</code></pre>
+<p>管理 VLAN ：</p>
+<pre><code>是专为网络管理流量（包括 SSH、Telnet、HTTPS、HHTP 和 SNMP流量）而配置的数据 VLAN。在默认情况下，VLAN 1 会充当第 2 层交换机上的管理 VLAN。
+</code></pre>
+<p>普通范围 VLAN： 编号为 1 至 1,005<br>
+以下是普通范围 VLAN 的特征：</p>
+<pre><code>它们主要用于中小型商业网络和企业网络。
+VLAN ID 范围为 1 到 1005。
+ID 1002 到 1005 是为传统网络技术（如令牌环和光纤分布式数据接口 ）保留的 VLAN。
+ID 1 和 ID 1002 到 1005 是自动创建的，不能删除。
+VLAN 配置存储在交换机闪存中一个名为 vlan.dat 的 VLAN 数据库文件中。
+配置 后，VLAN 中继协议 (VTP) 有助于在交换机之间同步 VLAN 数据库。
+</code></pre>
+<p>扩展范围 VLAN范围：是 1006 到 4094<br>
+以下是扩展范围 VLAN 的特性：</p>
+<pre><code>服务提供商会用这些 VLAN 来给不同的客户提供服务，一 些规模很大的跨国企业也有可能需要扩展范围的 VLAN ID。
+这些 VLAN 的 VLAN ID 范围是 1006 到 4094。
+在默认情况下，配置会保存在运行配置文件中。
+它们支持的 VLAN 特性比普通范围 VLAN 要少。
+需要配置 VTP 透明模式才能支持扩展范围 VLAN。
+</code></pre>
+<p>注意: 由于 IEEE 802.1Q 报头的 VLAN ID 字段有 12 位，因此 4096 是 Catalyst 交换机上可用 VLAN 数量的上限。</p>
+<p><strong>4.动态中继协议4协商模式：</strong></p>
+<p>access：<br>
+将接口（接入端口）设置为永久非中继模式，并且 通过协商把链路转换为非干道链路。<br>
+无论相邻接口是不是中继接口，这个接口 都会成为一个非中继接口。<br>
+dynamic auto：<br>
+让这个接口能够把链路转换为一条干道链路。<br>
+如果相邻接口设置为中继或者desirable模式， 这个接口就会成为一个中继接口。<br>
+所有以太网接口的默认交换机端口模式都是 dynamic auto.<br>
+dynamic desirable：<br>
+让这个接口主动尝试把链路切换为一条干道 链路。<br>
+如果相邻接口设置为中继、desirable或者dynamic auto模式， 这个接口也会成为中继接口。<br>
+trunk：<br>
+将接口配置为永久中继模式，并协商 将相邻的链接转换为一条干道链路。<br>
+即使相邻接口不是中继接口，这个接口 也会成为中继接口。</p>
+<p><strong>5.解释下面命令：</strong><br>
+进入接口F 0/1配置模式。	<br>
+Switch(config)# interface fastEthernet 0/1</p>
+<p>将端口设置为永久中继模式。	<br>
+Switch(config-if)# switchport mode trunk</p>
+<p>将本征 VLAN 设置为VLAN 1之外的VLAN。	<br>
+Switch(config-if)# switchport trunk native vlan 99</p>
+<p>指定在 TRUNK 链路上允许的 VLAN 列表。	<br>
+Switch(config-if)# switchport trunk allowed vlan 10,20,30,99</p>
+<h1 id="第3次作业">第3次作业：</h1>
+<p><strong>1.什么是VLAN路由，它的3种选择？</strong><br>
+<code>VLAN间路由：</code></p>
+<pre><code>VLAN 的作用是出于各种原因对一个第 2 层交换网络进行分隔。无论是出于什么原因，一个 VLAN 中的主机都无法与另一个 VLAN 中的主机通信，除非有路由器或第 3 层交换机来提供路由服务。
+VLAN 间路由是一个把网络流量从一个 VLAN 转发到另一个 VLAN 的过程。
+</code></pre>
+<p><code>VLAN 间路由有三种选项：</code></p>
+<pre><code>传统的 VLAN 间路由 - 这是一个传统的解决方案。它的扩展性乏善可陈。
+单臂路由器 - 在中小型网络中，这是一种可以接受的解决方案。
+使用交换虚拟接口 (SVI) 的第 3 层交换机 - 这种解决方案最具可扩展性，适用于中型到大型组织机构。
+</code></pre>
+<p><strong>2.传统VLAN间路由中连接路由器的交换机接口模式是什么?什么是单臂VLAN间路由？连接路由器的交换机接口是什么模式？</strong><br>
+传统VLAN间路由中连接路由器的交换机接口模式是access。<br>
+<code>单臂路由器 VLAN 间路由</code>方案克服了传统 VLAN 间路由方案的限制。它只需要用一个物理以太网接口，就可以在网络中的多个 VLAN 之间路由流量。<br>
+单臂VLAN间路由中连接路由器的交换机接口模式是trunk</p>
+<p><strong>3.常见的VLAN间路由错误</strong><br>
+<img src="https://dydydy123.github.io/post-images/1680840694926.png" alt="" loading="lazy"></p>
+<p><strong>4.解释如下命令</strong></p>
+<pre><code>进入G0/0/1.10子接口模式
+R1(config)# interface G0/0/1.10
+描述默认网关
+R1(config-subif)# description Default Gateway for VLAN 10
+将子接口配置为响应来自指定 vlan-id 的 802.1Q 封装的流量.
+R1(config-subif)# encapsulation dot1Q 10
+给子接口配置 IPv4 地址。这个地址一般会充当对应 VLAN 的默认网关。
+R1(config-subif)# ip add 192.168.10.1 255.255.255.0
+R1(config-subif)# exit
+</code></pre>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

